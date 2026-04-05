@@ -7,20 +7,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        @media print { .no-print { display: none; } }
-        canvas { border: 1px solid #ccc; background: #fff; width: 100%; height: 100px; border-radius: 4px; }
-        .table-custom th, .table-custom td { border: 1px solid #444; padding: 2px 4px; font-size: 9px; }
-        
-        #render-area { 
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 10mm;
+<style>
+    @media print { .no-print { display: none; } }
+    
+    canvas { 
+        border: 1px solid #ccc; 
+        background: #fff; 
+        width: 100%; 
+        height: 100px;
+        border-radius: 4px; 
+        touch-action: none; 
+    }
+
+    @media (max-width: 640px) {
+        canvas {
+            height: 180px;
         }
-        .avoid-break { page-break-inside: avoid; break-inside: avoid; }
-    </style>
+    }
+    
+    #render-area { 
+        background: white;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        padding: 10mm;
+    }
+
+    @media screen {
+        #render-area {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+        }
+    }
+    
+    .avoid-break { page-break-inside: avoid; break-inside: avoid; }
+</style>
 </head>
 <body class="bg-gray-100">
 
@@ -125,26 +147,34 @@
         let padPetugas, padCustomer;
         let currentStatus = "";
 
-        function initForm(status) {
-            currentStatus = status;
-            document.getElementById('selection-step').classList.add('hidden');
-            document.getElementById('main-form').classList.remove('hidden');
-            document.getElementById('label-status').innerText = "UNIT " + status;
-            
-            renderRows('table-dokumen', dataDokumen);
-            renderRows('table-perlengkapan', dataPerlengkapan);
-            renderRows('table-merchandise', dataMerchandise);
+function initForm(status) {
+    currentStatus = status;
+    document.getElementById('selection-step').classList.add('hidden');
+    document.getElementById('main-form').classList.remove('hidden');
+    document.getElementById('label-status').innerText = "UNIT " + status;
+    
+    renderRows('table-dokumen', dataDokumen);
+    renderRows('table-perlengkapan', dataPerlengkapan);
+    renderRows('table-merchandise', dataMerchandise);
 
-            padPetugas = new SignaturePad(document.getElementById('canvas-petugas'));
-            padCustomer = new SignaturePad(document.getElementById('canvas-customer'));
+    // Inisialisasi Pad
+    const canvasP = document.getElementById('canvas-petugas');
+    const canvasC = document.getElementById('canvas-customer');
+    
+    padPetugas = new SignaturePad(canvasP);
+    padCustomer = new SignaturePad(canvasC);
 
-            document.getElementById('input-pic-petugas').addEventListener('input', (e) => {
-                document.getElementById('label-sign-petugas').innerText = `( ${e.target.value.toUpperCase() || '.................................'} )`;
-            });
-            document.getElementById('input-nama-konsumen').addEventListener('input', (e) => {
-                document.getElementById('label-sign-customer').innerText = `( ${e.target.value.toUpperCase() || '.................................'} )`;
-            });
-        }
+    // Panggil resize agar sensitivitas sentuhan akurat
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    document.getElementById('input-pic-petugas').addEventListener('input', (e) => {
+        document.getElementById('label-sign-petugas').innerText = `( ${e.target.value.toUpperCase() || '.................................'} )`;
+    });
+    document.getElementById('input-nama-konsumen').addEventListener('input', (e) => {
+        document.getElementById('label-sign-customer').innerText = `( ${e.target.value.toUpperCase() || '.................................'} )`;
+    });
+}
 
         function renderRows(tableId, data) {
             const tbody = document.getElementById(tableId);
