@@ -8,37 +8,50 @@
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-    @media print { .no-print { display: none; } }
-    
-    canvas { 
-        border: 1px solid #ccc; 
-        background: #fff; 
-        width: 100%; 
-        height: 100px;
-        border-radius: 4px; 
-        touch-action: none; 
-    }
+    /* Reset dasar untuk PDF */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #f3f4f6; }
 
-    @media (max-width: 640px) {
-        canvas {
-            height: 180px;
-        }
+    @media print { 
+        .no-print { display: none !important; } 
+        body { background: white; }
     }
     
     #render-area { 
         background: white;
         width: 210mm;
-        min-height: 297mm;
+        /* Tinggi A4 adalah 297mm, kita kurangi sedikit agar aman dari auto-page break */
+        max-height: 295mm; 
         margin: 0 auto;
-        padding: 10mm;
+        padding: 8mm 10mm; /* Padding diperkecil agar muat lebih banyak */
+        position: relative;
     }
 
-    @media screen {
+    /* Tabel lebih rapat */
+    .table-custom th, .table-custom td { 
+        border: 1px solid #444; 
+        padding: 1px 4px; 
+        font-size: 8.5px; /* Sedikit diperkecil */
+        line-height: 1.1;
+    }
+
+    canvas { 
+        border: 1px solid #ccc; 
+        background: #fff; 
+        width: 100%; 
+        height: 80px; /* Tinggi canvas di perkecil untuk menghemat ruang */
+        border-radius: 4px; 
+        touch-action: none;
+    }
+
+    /* Penyesuaian di layar HP agar tetap responsif tapi tidak merusak layout PDF */
+    @media screen and (max-width: 640px) {
         #render-area {
-            max-width: 100%;
-            width: auto;
+            width: 100%;
+            padding: 15px;
             height: auto;
         }
+        canvas { height: 150px; }
     }
     
     .avoid-break { page-break-inside: avoid; break-inside: avoid; }
