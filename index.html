@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital BASTK Hyundai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @media print { .no-print { display: none; } }
+        canvas { border: 1px solid #ccc; background: #fff; width: 100%; height: 150px; border-radius: 4px; }
+        .table-custom th, .table-custom td { border: 1px solid #444; padding: 4px; font-size: 11px; }
+    </style>
+</head>
+<body class="bg-gray-100 p-2">
+
+    <div id="render-area" class="max-w-4xl mx-auto bg-white p-6 shadow-lg">
+        <div class="flex justify-between items-start border-b-2 border-black pb-4 mb-4">
+            <div>
+                <h1 class="text-2xl font-black text-blue-900">HYUNDAI</h1>
+                <p class="text-[10px] text-gray-700">Wisma Mulia, Lt. 25, Suite 2502</p>
+                <p class="text-[10px] text-gray-700">Jl. Jend. Gatot Subroto No. 42, Jakarta 12710</p>
+                <p class="text-[10px] text-gray-700">Telp: +62 21 3118 2611</p>
+            </div>
+            <div class="text-right">
+                <h2 class="font-bold text-lg">INSPECTION CHECK LIST</h2>
+                <p class="text-sm font-semibold">(BERITA ACARA SERAH TERIMA KENDARAAN)</p>
+            </div>
+        </div>
+
+        <div id="selection-step" class="no-print bg-blue-50 p-6 rounded-lg text-center mb-6">
+            <h3 class="font-bold mb-4 italic text-blue-800 underline">SILAHKAN PILIH PROSES UNIT</h3>
+            <div class="flex gap-4 justify-center">
+                <button onclick="initForm('KELUAR')" class="bg-blue-700 text-white px-8 py-3 rounded-lg shadow-md font-bold hover:bg-blue-800 transition">UNIT KELUAR</button>
+                <button onclick="initForm('MASUK')" class="bg-green-700 text-white px-8 py-3 rounded-lg shadow-md font-bold hover:bg-green-800 transition">UNIT MASUK</button>
+            </div>
+        </div>
+
+        <div id="main-form" class="hidden">
+            <div class="grid grid-cols-2 gap-6 mb-4 text-xs">
+                <div class="space-y-2">
+                    <div class="flex border-b border-gray-400">
+                        <span class="w-32 font-bold">Tanggal</span><span>:</span>
+                        <input type="date" id="input-tgl" class="flex-1 px-2 outline-none">
+                    </div>
+                    <div class="flex border-b border-gray-400">
+                        <span class="w-32 font-bold">Plat Number</span><span>:</span>
+                        <input type="text" id="input-plat" placeholder="Contoh: B 1658 DOO" class="flex-1 px-2 outline-none uppercase">
+                    </div>
+                    <div class="flex border-b border-gray-400">
+                        <span class="w-32 font-bold">Nama PIC/Konsumen</span><span>:</span>
+                        <input type="text" id="input-pic" class="flex-1 px-2 outline-none">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex border-b border-gray-400">
+                        <span class="w-32 font-bold">KM</span><span>:</span>
+                        <input type="number" id="input-km" placeholder="29825" class="flex-1 px-2 outline-none">
+                    </div>
+                    <div class="flex border-b border-gray-400">
+                        <span class="w-32 font-bold">Battery/BBM (%)</span><span>:</span>
+                        <input type="text" id="input-battery" placeholder="83%" class="flex-1 px-2 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="bg-gray-800 text-white px-2 py-1 text-[11px] font-bold mb-1">I. DOKUMEN</h3>
+            <table class="w-full table-custom mb-4 border-collapse">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="w-8 text-center">No</th>
+                        <th>Nama Perlengkapan</th>
+                        <th class="w-16 text-center">Ada</th>
+                        <th class="w-16 text-center">Tdk Ada</th>
+                    </tr>
+                </thead>
+                <tbody id="table-dokumen"></tbody>
+            </table>
+
+            <h3 class="bg-gray-800 text-white px-2 py-1 text-[11px] font-bold mb-1">II. PERLENGKAPAN KENDARAAN</h3>
+            <table class="w-full table-custom mb-4 border-collapse">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="w-8 text-center">No</th>
+                        <th>Nama Perlengkapan</th>
+                        <th class="w-16 text-center">Ada</th>
+                        <th class="w-16 text-center">Tdk Ada</th>
+                    </tr>
+                </thead>
+                <tbody id="table-perlengkapan"></tbody>
+            </table>
+
+            <h3 class="bg-gray-800 text-white px-2 py-1 text-[11px] font-bold mb-1">III. MERCHANDISE</h3>
+            <table class="w-full table-custom mb-4 border-collapse">
+                <tbody id="table-merchandise"></tbody>
+            </table>
+
+            <div class="mb-6">
+                <h3 class="bg-red-700 text-white px-2 py-1 text-[11px] font-bold mb-1">CATATAN KERUSAKAN (Ganti Gambar Mobil)</h3>
+                <textarea id="input-catatan" rows="4" class="w-full border border-gray-400 p-2 text-xs italic bg-yellow-50" placeholder="Contoh: 1. Bumper FR LH Baret, 2. Velg FR LH Baret..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 text-center mt-6">
+                <div>
+                    <p class="text-xs font-bold mb-2">Hyundai Team / Petugas</p>
+                    <canvas id="canvas-hyundai"></canvas>
+                    <button type="button" onclick="padHyundai.clear()" class="no-print text-[10px] text-red-500 underline mt-1">Hapus Tanda Tangan</button>
+                    <div class="mt-2 border-t border-black inline-block px-4 text-xs font-bold">( .................................. )</div>
+                </div>
+                <div>
+                    <p class="text-xs font-bold mb-2">Nama Konsumen / Penerima</p>
+                    <canvas id="canvas-customer"></canvas>
+                    <button type="button" onclick="padCustomer.clear()" class="no-print text-[10px] text-red-500 underline mt-1">Hapus Tanda Tangan</button>
+                    <div class="mt-2 border-t border-black inline-block px-4 text-xs font-bold" id="label-pic">( .................................. )</div>
+                </div>
+            </div>
+
+            <button onclick="generatePDF()" class="no-print w-full mt-10 bg-blue-900 text-white py-4 font-bold rounded-xl shadow-lg hover:bg-blue-800 active:scale-95 transition uppercase tracking-widest">
+                Export to PDF (Nama File Otomatis)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DATA KELENGKAPAN SESUAI DOKUMEN 
+        const dataDokumen = ["STNK Pajak 5 Tahun", "STNK Pajak 1 Tahun", "Buku Manual", "Buku Service", "Kartu Parkir"];
+        const dataPerlengkapan = [
+            "Kunci Kontak", "Kunci Cadangan", "AC", "Asbak", "Kaca Spion Dalam", "Kaca Spion Luar", "Karpet Depan", 
+            "Karpet Tengah", "Karpet Belakang", "Klakson", "Lighter/Pemantik Api", 
+            "Loud Speaker", "P3K", "Penahan Sinar Matahari", "Radio/Tape/CD", 
+            "Sandaran Kepala", "Antena", "Whell Dop/Dop Roda", "APAR",
+            "Penahan Lumpur", "Segitiga Pengaman", "Talang Air", "Ban Serep", 
+            "Dongkrak", "Tool Set", "Tire Kit", "Charging Standar Pabrikan Hyundai", "V2L", 
+            "Lampu Bumper", "Spoiler"
+        ];
+        const dataMerchandise = ["Payung", "Pewangi"];
+
+        let padHyundai, padCustomer;
+        let currentStatus = "";
+
+        function initForm(status) {
+            currentStatus = status;
+            document.getElementById('selection-step').classList.add('hidden');
+            document.getElementById('main-form').classList.remove('hidden');
+            
+            renderRows('table-dokumen', dataDokumen);
+            renderRows('table-perlengkapan', dataPerlengkapan);
+            renderRows('table-merchandise', dataMerchandise);
+
+            padHyundai = new SignaturePad(document.getElementById('canvas-hyundai'));
+            padCustomer = new SignaturePad(document.getElementById('canvas-customer'));
+
+            // Sync PIC name to signature label
+            document.getElementById('input-pic').addEventListener('input', (e) => {
+                document.getElementById('label-pic').innerText = `( ${e.target.value || '..................................'} )`;
+            });
+        }
+
+        function renderRows(tableId, data) {
+            const tbody = document.getElementById(tableId);
+            data.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item}</td>
+                        <td class="text-center"><input type="radio" name="${tableId}_${index}" value="Ada" class="w-4 h-4"></td>
+                        <td class="text-center"><input type="radio" name="${tableId}_${index}" value="Tidak" class="w-4 h-4"></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        async function generatePDF() {
+            const platNo = (document.getElementById('input-plat').value || "NO-PLAT").replace(/\s+/g, '-').toUpperCase();
+            const tgl = document.getElementById('input-tgl').value || "NO-DATE";
+            const fileName = `BASTK_${currentStatus}_${platNo}_${tgl}.pdf`;
+
+            const element = document.getElementById('render-area');
+            const opt = {
+                margin: 0.2,
+                filename: fileName,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+                alert('PDF Berhasil dibuat dengan nama: ' + fileName);
+            } catch (error) {
+                console.error(error);
+                alert('Gagal membuat PDF');
+            }
+        }
+    </script>
+</body>
+</html>
