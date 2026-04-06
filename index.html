@@ -24,11 +24,26 @@
             height: 297mm;
             padding: 10mm 15mm;
         }
-        .section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .table-custom th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        input[type="radio"] { appearance: none; -webkit-appearance: none; border: 1px solid #1e3a8a; width: 10px; height: 10px; border-radius: 50%; position: relative; }
-        input[type="radio"]:checked::after { content: ''; width: 6px; height: 6px; background: #1e3a8a; position: absolute; top: 1px; left: 1px; border-radius: 50%; }
+.section-title, .table-custom th { 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
     }
+
+    /* Perbaikan tampilan Radio Button agar muncul saat di-print */
+    input[type="radio"] { 
+        appearance: auto !important; /* Kembalikan ke tampilan standar browser agar terbaca printer */
+        -webkit-appearance: auto !important;
+        width: 12px; 
+        height: 12px; 
+        border: 1px solid #000; /* Garis tepi hitam pekat */
+    }
+
+    /* Opsional: Jika ingin tetap kustom, gunakan teknik border tebal */
+    input[type="radio"]:checked {
+        outline: 0px solid #1e3a8a !important; /* Memberikan tanda visual yang kuat */
+        outline-offset: -4px;
+    }
+}
     
     #render-area { 
         background: white;
