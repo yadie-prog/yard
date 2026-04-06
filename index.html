@@ -148,22 +148,26 @@
                 <textarea id="input-catatan" rows="4" class="w-full border border-gray-300 p-2 text-[9px] font-bold italic bg-gray-50 outline-none resize-none rounded shadow-inner" placeholder="Tuliskan detail kondisi unit secara lengkap di sini..."></textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-12 text-center mt-6">
-                <div class="flex flex-col items-center">
-                    <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Hyundai Team</p>
-                    <canvas id="canvas-petugas" class="mb-1"></canvas>
-                    <div class="w-full border-t-2 border-gray-800 pt-1">
-                        <span id="label-sign-petugas" class="text-[10px] font-black uppercase">.................................</span>
-                    </div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Nama Konsumen</p>
-                    <canvas id="canvas-customer" class="mb-1"></canvas>
-                    <div class="w-full border-t-2 border-gray-800 pt-1">
-                        <span id="label-sign-customer" class="text-[10px] font-black uppercase">.................................</span>
-                    </div>
-                </div>
-            </div>
+<div class="grid grid-cols-2 gap-12 text-center mt-6">
+    <div class="flex flex-col items-center">
+        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Hyundai Team</p>
+        <canvas id="canvas-petugas" class="mb-1"></canvas>
+        <button type="button" onclick="padPetugas.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+        
+        <div class="w-full border-t-2 border-gray-800 pt-1">
+            <span id="label-sign-petugas" class="text-[10px] font-black uppercase">.................................</span>
+        </div>
+    </div>
+    <div class="flex flex-col items-center">
+        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Nama Konsumen</p>
+        <canvas id="canvas-customer" class="mb-1"></canvas>
+        <button type="button" onclick="padCustomer.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+
+        <div class="w-full border-t-2 border-gray-800 pt-1">
+            <span id="label-sign-customer" class="text-[10px] font-black uppercase">.................................</span>
+        </div>
+    </div>
+</div>
 
             <div class="no-print mt-10">
                 <button onclick="window.print()" class="w-full bg-blue-900 hover:bg-black text-white py-4 font-black rounded-xl shadow-2xl uppercase text-sm tracking-widest transition-all transform hover:scale-[1.01]">
