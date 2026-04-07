@@ -21,73 +21,14 @@
             box-shadow: none !important; 
             margin: 0 !important; 
             width: 210mm;
-            height: 330mm;
+            min-height: 330mm;
             padding: 10mm 15mm;
         }
-.section-title, .table-custom th { 
-        -webkit-print-color-adjust: exact !important; 
-        print-color-adjust: exact !important; 
+        .section-title, .table-custom th { 
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important; 
+        }
     }
-
-      /* Container Foto khusus Print */
-.photo-page {
-    page-break-before: always; /* Otomatis pindah halaman baru */
-    width: 210mm;
-    height: 330mm;
-    padding: 15mm;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 kolom */
-    grid-template-rows: repeat(4, 1fr);    /* 4 baris */
-    gap: 10mm;
-    box-sizing: border-box;
-}
-
-.print-photo-item {
-    width: 100%;
-    height: 65mm; /* Ukuran proporsional agar muat 8 foto */
-    object-fit: cover;
-    border: 1px solid #1e3a8a;
-    border-radius: 8px;
-}
-
-/* Sembunyikan container print di layar browser, munculkan saat print */
-.print-only { display: none; }
-
-@media print {
-    .print-only { display: block; }
-    .no-print { display: none !important; }
-}
-
-/* Gaya Preview di Layar (Hanya untuk tampilan HP/Desktop) */
-#photoPreview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-}
-.preview-thumbnail {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #cbd5e1;
-}
-      
-    /* Perbaikan tampilan Radio Button agar muncul saat di-print */
-    input[type="radio"] { 
-        appearance: auto !important; /* Kembalikan ke tampilan standar browser agar terbaca printer */
-        -webkit-appearance: auto !important;
-        width: 12px; 
-        height: 12px; 
-        border: 1px solid #000; /* Garis tepi hitam pekat */
-    }
-
-    /* Opsional: Jika ingin tetap kustom, gunakan teknik border tebal */
-    input[type="radio"]:checked {
-        outline: 0px solid #1e3a8a !important; /* Memberikan tanda visual yang kuat */
-        outline-offset: -4px;
-    }
-}
     
     #render-area { 
         background: white;
@@ -108,7 +49,6 @@
     }
     .table-custom th { background-color: #f8fafc; color: #1e3a8a; font-weight: bold; text-transform: uppercase; }
 
-    /* Area Tanda Tangan diperbesar */
     canvas { 
         border: 1px solid #cbd5e1; 
         background: #fff; 
@@ -132,48 +72,47 @@
     input:focus { outline: none; }
     .input-line { border-bottom: 1px solid #e2e8f0; }
 
-/* Penyesuaian untuk layar (Mobile/Tablet) */
-@media screen and (max-width: 768px) {
-    body { background: #f3f4f6; padding: 10px; }
-    
-    #render-area { 
-        width: 100%; 
-        min-height: auto; 
-        padding: 15px; 
-        margin: 0;
-        overflow-x: hidden;
+    /* CSS FOTO UNTUK CETAK */
+    .photo-page {
+        page-break-before: always; /* Memaksa pindah halaman setelah TTD */
+        width: 210mm;
+        height: 330mm;
+        padding: 15mm;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 10mm;
+        box-sizing: border-box;
     }
 
-    /* Membuat tabel bisa di-scroll secara horizontal jika layar terlalu sempit */
-    .table-responsive {
+    .print-photo-item {
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        height: 65mm;
+        object-fit: cover;
+        border: 1px solid #1e3a8a;
+        border-radius: 8px;
     }
 
-    /* Memperbesar input agar mudah ditekan jari */
-    input[type="radio"] {
-        width: 18px;
-        height: 18px;
+    .print-only { display: none; }
+
+    @media print {
+        .print-only { display: block; }
+        .no-print { display: none !important; }
+        input[type="radio"] { 
+            appearance: auto !important; 
+            -webkit-appearance: auto !important; 
+        }
     }
 
-    .grid-cols-2 {
-        grid-template-columns: 1fr; /* Tumpuk kolom jadi 1 di HP */
-    }
+    /* Preview Layar */
+    #photoPreview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .preview-thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
 
-    canvas {
-        height: 150px; /* Area tanda tangan lebih luas di HP */
+    @media screen and (max-width: 768px) {
+        #render-area { width: 100%; padding: 15px; margin: 0; }
+        .grid-cols-2 { grid-template-columns: 1fr; }
+        canvas { height: 150px; }
     }
-}
-
-/* Memperbaiki tampilan Radio Button agar tetap terlihat saat Print */
-@media print {
-    input[type="radio"] {
-        appearance: auto !important;
-        -webkit-appearance: auto !important;
-    }
-}
-
 </style>
 </head>
 <body class="bg-gray-200">
@@ -247,47 +186,42 @@
 
             <div class="mt-4">
                 <h3 class="section-title !bg-red-800">III. CATATAN KERUSAKAN / KONDISI KHUSUS</h3>
-                <textarea id="input-catatan" rows="4" class="w-full border border-gray-300 p-2 text-[9px] font-bold italic bg-gray-50 outline-none resize-none rounded shadow-inner" placeholder="Tuliskan detail kondisi unit secara lengkap di sini..."></textarea>
+                <textarea id="input-catatan" rows="3" class="w-full border border-gray-300 p-2 text-[9px] font-bold italic bg-gray-50 outline-none resize-none rounded" placeholder="Tuliskan detail kondisi unit..."></textarea>
             </div>
 
-<div class="no-print mt-6 p-4 bg-blue-50 rounded-lg border-2 border-dashed border-blue-200">
-    <h3 class="text-blue-900 font-bold mb-2">📸 Unggah Foto Dokumentasi (Maks. 8 per halaman)</h3>
-    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)" 
-           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
-    <div id="photoPreview"></div>
-</div>
+            <div class="no-print mt-6 p-4 bg-blue-50 rounded-lg border-2 border-dashed border-blue-200">
+                <h3 class="text-blue-900 font-bold mb-2">📸 Unggah Foto Dokumentasi (Maks. 8 per halaman)</h3>
+                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)" 
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                <div id="photoPreview"></div>
+            </div>
 
-<div id="printPhotoContainer" class="print-only"></div>
-
-<div id="printPhotoContainer" class="print-only">
-    </div>
-
-<div class="grid grid-cols-2 gap-12 text-center mt-6">
-    <div class="flex flex-col items-center">
-        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Hyundai Team</p>
-        <canvas id="canvas-petugas" class="mb-1"></canvas>
-        <button type="button" onclick="padPetugas.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
-        
-        <div class="w-full border-t-2 border-gray-800 pt-1">
-            <span id="label-sign-petugas" class="text-[10px] font-black uppercase">.................................</span>
-        </div>
-    </div>
-    <div class="flex flex-col items-center">
-        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Nama Konsumen</p>
-        <canvas id="canvas-customer" class="mb-1"></canvas>
-        <button type="button" onclick="padCustomer.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
-
-        <div class="w-full border-t-2 border-gray-800 pt-1">
-            <span id="label-sign-customer" class="text-[10px] font-black uppercase">.................................</span>
-        </div>
-    </div>
-</div>
+            <div class="grid grid-cols-2 gap-12 text-center mt-6">
+                <div class="flex flex-col items-center">
+                    <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Hyundai Team</p>
+                    <canvas id="canvas-petugas" class="mb-1"></canvas>
+                    <button type="button" onclick="padPetugas.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+                    <div class="w-full border-t-2 border-gray-800 pt-1">
+                        <span id="label-sign-petugas" class="text-[10px] font-black uppercase">.................................</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Nama Konsumen</p>
+                    <canvas id="canvas-customer" class="mb-1"></canvas>
+                    <button type="button" onclick="padCustomer.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+                    <div class="w-full border-t-2 border-gray-800 pt-1">
+                        <span id="label-sign-customer" class="text-[10px] font-black uppercase">.................................</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="no-print mt-10">
                 <button onclick="window.print()" class="w-full bg-blue-900 hover:bg-black text-white py-4 font-black rounded-xl shadow-2xl uppercase text-sm tracking-widest transition-all transform hover:scale-[1.01]">
                     Cetak BASTK
                 </button>
             </div>
+
+            <div id="printPhotoContainer" class="print-only"></div>
         </div>
     </div>
 
@@ -301,46 +235,47 @@
         ];
 
         let padPetugas, padCustomer;
-function handlePhotos(event) {
-    const files = event.target.files;
-    const printContainer = document.getElementById('printPhotoContainer');
-    const previewContainer = document.getElementById('photoPreview');
-    
-    printContainer.innerHTML = ''; 
-    previewContainer.innerHTML = '';
 
-    const filesArray = Array.from(files);
-    let loadedCount = 0;
+        function handlePhotos(event) {
+            const files = event.target.files;
+            const printContainer = document.getElementById('printPhotoContainer');
+            const previewContainer = document.getElementById('photoPreview');
+            
+            printContainer.innerHTML = ''; 
+            previewContainer.innerHTML = '';
 
-    filesArray.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // 1. Tambahkan ke Preview Layar
-            const pImg = document.createElement('img');
-            pImg.src = e.target.result;
-            pImg.className = 'preview-thumbnail';
-            previewContainer.appendChild(pImg);
+            const filesArray = Array.from(files);
+            let loadedCount = 0;
 
-            // 2. Logika Halaman Cetak (8 foto per halaman)
-            const pageIndex = Math.floor(loadedCount / 8);
-            let currentPage = printContainer.children[pageIndex];
+            filesArray.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Preview Layar
+                    const pImg = document.createElement('img');
+                    pImg.src = e.target.result;
+                    pImg.className = 'preview-thumbnail';
+                    previewContainer.appendChild(pImg);
 
-            if (!currentPage) {
-                currentPage = document.createElement('div');
-                currentPage.className = 'photo-page';
-                printContainer.appendChild(currentPage);
-            }
+                    // Print Logic (8 foto per lembar)
+                    const pageIndex = Math.floor(loadedCount / 8);
+                    let currentPage = printContainer.children[pageIndex];
 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'print-photo-item';
-            currentPage.appendChild(img);
+                    if (!currentPage) {
+                        currentPage = document.createElement('div');
+                        currentPage.className = 'photo-page';
+                        printContainer.appendChild(currentPage);
+                    }
 
-            loadedCount++;
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'print-photo-item';
+                    currentPage.appendChild(img);
+
+                    loadedCount++;
+                }
+                reader.readAsDataURL(file);
+            });
         }
-        reader.readAsDataURL(file);
-    });
-}
       
         function initForm(status) {
             document.getElementById('selection-step').classList.add('hidden');
@@ -355,7 +290,6 @@ function handlePhotos(event) {
 
             setupCanvas();
             
-            // Sync Nama TTD
             document.getElementById('input-pic-petugas').addEventListener('input', (e) => {
                 document.getElementById('label-sign-petugas').innerText = e.target.value || '.................................';
             });
@@ -367,7 +301,6 @@ function handlePhotos(event) {
         function renderWithNote(id, data, start, prefix) {
             const tbody = document.getElementById(id);
             data.forEach((item, i) => {
-                // Menambahkan font-bold pada kolom item dan input keterangan
                 tbody.innerHTML += `<tr>
                     <td class="text-center">${start + i + 1}</td>
                     <td class="font-bold">${item}</td>
