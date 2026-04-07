@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital BASTK Hyundai - ITC PERMATA HIJAU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+<style>
+    /* Reset & Dasar F4 (210 x 330 mm) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    @media print { 
+        @page {
+            size: 210mm 330mm; 
+            margin: 0;
+        }
+        .no-print { display: none !important; } 
+        body { background: white; padding: 0; }
+        #render-area { 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            width: 210mm;
+            height: 330mm;
+            padding: 10mm 15mm;
+        }
+.section-title, .table-custom th { 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+    }
+
+      /* Container Foto khusus Print */
+.photo-page {
+    page-break-before: always; /* Otomatis pindah halaman baru */
+    width: 210mm;
+    height: 330mm;
+    padding: 15mm;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 kolom */
+    grid-template-rows: repeat(4, 1fr);    /* 4 baris */
+    gap: 10mm;
+    box-sizing: border-box;
+}
+
+.print-photo-item {
+    width: 100%;
+    height: 65mm; /* Ukuran proporsional agar muat 8 foto */
+    object-fit: cover;
+    border: 1px solid #1e3a8a;
+    border-radius: 8px;
+}
+
+/* Sembunyikan container print di layar browser, munculkan saat print */
+.print-only { display: none; }
+
+@media print {
+    .print-only { display: block; }
+    .no-print { display: none !important; }
+}
+
+/* Gaya Preview di Layar (Hanya untuk tampilan HP/Desktop) */
+#photoPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.preview-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+}
+      
+    /* Perbaikan tampilan Radio Button agar muncul saat di-print */
+    input[type="radio"] { 
+        appearance: auto !important; /* Kembalikan ke tampilan standar browser agar terbaca printer */
+        -webkit-appearance: auto !important;
+        width: 12px; 
+        height: 12px; 
+        border: 1px solid #000; /* Garis tepi hitam pekat */
+    }
+
+    /* Opsional: Jika ingin tetap kustom, gunakan teknik border tebal */
+    input[type="radio"]:checked {
+        outline: 0px solid #1e3a8a !important; /* Memberikan tanda visual yang kuat */
+        outline-offset: -4px;
+    }
+}
+    
+    #render-area { 
+        background: white;
+        width: 210mm;
+        min-height: 330mm;
+        margin: 20px auto;
+        padding: 10mm 15mm;
+        position: relative;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .table-custom { width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: fixed; }
+    .table-custom th, .table-custom td { 
+        border: 1px solid #1e3a8a; 
+        padding: 3px 5px; 
+        font-size: 8.5px; 
+        line-height: 1.1;
+    }
+    .table-custom th { background-color: #f8fafc; color: #1e3a8a; font-weight: bold; text-transform: uppercase; }
+
+    /* Area Tanda Tangan diperbesar */
+    canvas { 
+        border: 1px solid #cbd5e1; 
+        background: #fff; 
+        width: 100%; 
+        height: 100px; 
+        border-radius: 4px; 
+    }
+
+    .section-title {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 4px 10px;
+        font-size: 9.5px;
+        font-weight: bold;
+        margin-top: 6px;
+        margin-bottom: 4px;
+        border-left: 4px solid #f97316;
+    }
+
+    input { border: none; background: transparent; width: 100%; }
+    input:focus { outline: none; }
+    .input-line { border-bottom: 1px solid #e2e8f0; }
+
+/* Penyesuaian untuk layar (Mobile/Tablet) */
+@media screen and (max-width: 768px) {
+    body { background: #f3f4f6; padding: 10px; }
+    
+    #render-area { 
+        width: 100%; 
+        min-height: auto; 
+        padding: 15px; 
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* Membuat tabel bisa di-scroll secara horizontal jika layar terlalu sempit */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Memperbesar input agar mudah ditekan jari */
+    input[type="radio"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    .grid-cols-2 {
+        grid-template-columns: 1fr; /* Tumpuk kolom jadi 1 di HP */
+    }
+
+    canvas {
+        height: 150px; /* Area tanda tangan lebih luas di HP */
+    }
+}
+
+/* Memperbaiki tampilan Radio Button agar tetap terlihat saat Print */
+@media print {
+    input[type="radio"] {
+        appearance: auto !important;
+        -webkit-appearance: auto !important;
+    }
+}
+
+</style>
+</head>
+<body class="bg-gray-200">
+
+    <div id="render-area" class="shadow-xl">
+        <div class="flex justify-between items-start border-b-2 border-blue-900 pb-3 mb-4">
+            <div>
+                <img src="Hyundai_logo.png" alt="Hyundai Logo" class="h-10 mb-2">
+                <div class="text-[8.5px] text-gray-700 leading-tight">
+                    <p class="font-bold">PT. Hyundai Motors Indonesia</p>
+                    <p>Wisma Mulia, Lt. 25, Suite 2502</p>
+                    <p>Jl. Jend. Gatot Subroto No. 42, Jakarta 12710</p>
+                    <p class="font-semibold text-blue-800">Telp: +62 21 3118 2611</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <h2 class="font-bold text-xl text-blue-900 leading-none">INSPECTION CHECK LIST</h2>
+                <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">(Berita Acara Serah Terima Kendaraan)</p>
+            </div>
+        </div>
+
+        <div id="selection-step" class="no-print bg-white p-10 rounded-xl text-center border-2 border-dashed border-blue-300 my-10">
+            <h3 class="font-black mb-6 text-blue-900 text-2xl uppercase">Pilih Jenis Transaksi Unit</h3>
+            <div class="flex gap-6 justify-center">
+                <button onclick="initForm('KELUAR')" class="bg-blue-700 hover:bg-blue-800 text-white px-10 py-4 rounded-lg shadow-lg font-bold transition-all">UNIT KELUAR</button>
+                <button onclick="initForm('MASUK')" class="bg-teal-600 hover:bg-teal-700 text-white px-10 py-4 rounded-lg shadow-lg font-bold transition-all">UNIT MASUK</button>
+            </div>
+        </div>
+
+        <div id="main-form" class="hidden">
+            <div class="grid grid-cols-2 gap-x-12 gap-y-2 mb-4 text-[9.5px]">
+                <div class="space-y-2">
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">PIC Hyundai</span><span class="mr-2">:</span><input type="text" id="input-pic-petugas" class="flex-1 font-semibold uppercase"></div>
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">Nama Konsumen</span><span class="mr-2">:</span><input type="text" id="input-nama-konsumen" class="flex-1 font-semibold uppercase"></div>
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">No. Telp</span><span class="mr-2">:</span><input type="text" id="input-telp-konsumen" class="flex-1 font-semibold"></div>
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">No. Polisi</span><span class="mr-2">:</span><input type="text" id="input-plat" class="flex-1 font-black text-blue-800 uppercase" placeholder="B 1234 XXX"></div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">Tanggal</span><span class="mr-2">:</span><input type="date" id="input-tgl" class="flex-1"></div>
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">Kilometer</span><span class="mr-2">:</span><input type="number" id="input-km" class="flex-1 font-semibold"></div>
+                    <div class="flex items-end pb-1 input-line"><span class="w-28 font-bold text-blue-900">BBM / Battery (%)</span><span class="mr-2">:</span><input type="text" id="input-battery" class="flex-1 font-semibold"></div>
+                    <div class="flex items-end pb-1"><span class="w-28 font-bold text-blue-900">Status Unit</span><span class="mr-2">:</span><span id="label-status" class="font-black bg-blue-100 px-2 text-blue-900 rounded"></span></div>
+                </div>
+            </div>
+
+            <h3 class="section-title">I. DOKUMEN KENDARAAN</h3>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">No</th>
+                        <th style="width: 240px;">Item Deskripsi</th>
+                        <th style="width: 45px;">Ada</th>
+                        <th style="width: 45px;">Tdk</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody id="table-dokumen"></tbody>
+            </table>
+
+            <h3 class="section-title">II. PERLENGKAPAN KENDARAAN</h3>
+            <div class="grid grid-cols-2 gap-x-6">
+                <table class="table-custom">
+                    <thead><tr><th style="width: 25px;">No</th><th style="width: 90px;">Item</th><th style="width: 30px;">Ada</th><th style="width: 30px;">Tdk</th><th>Keterangan</th></tr></thead>
+                    <tbody id="table-perlengkapan-left"></tbody>
+                </table>
+                <table class="table-custom">
+                    <thead><tr><th style="width: 25px;">No</th><th style="width: 90px;">Item</th><th style="width: 30px;">Ada</th><th style="width: 30px;">Tdk</th><th>Keterangan</th></tr></thead>
+                    <tbody id="table-perlengkapan-right"></tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <h3 class="section-title !bg-red-800">III. CATATAN KERUSAKAN / KONDISI KHUSUS</h3>
+                <textarea id="input-catatan" rows="4" class="w-full border border-gray-300 p-2 text-[9px] font-bold italic bg-gray-50 outline-none resize-none rounded shadow-inner" placeholder="Tuliskan detail kondisi unit secara lengkap di sini..."></textarea>
+            </div>
+
+<div class="no-print mt-6 p-4 bg-blue-50 rounded-lg border-2 border-dashed border-blue-200">
+    <h3 class="text-blue-900 font-bold mb-2">📸 Unggah Foto Dokumentasi (Maks. 8 per halaman)</h3>
+    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)" 
+           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+    <div id="photoPreview"></div>
+</div>
+
+<div id="printPhotoContainer" class="print-only"></div>
+
+<div id="printPhotoContainer" class="print-only">
+    </div>
+
+<div class="grid grid-cols-2 gap-12 text-center mt-6">
+    <div class="flex flex-col items-center">
+        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Hyundai Team</p>
+        <canvas id="canvas-petugas" class="mb-1"></canvas>
+        <button type="button" onclick="padPetugas.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+        
+        <div class="w-full border-t-2 border-gray-800 pt-1">
+            <span id="label-sign-petugas" class="text-[10px] font-black uppercase">.................................</span>
+        </div>
+    </div>
+    <div class="flex flex-col items-center">
+        <p class="text-[9px] font-bold text-blue-900 mb-2 uppercase tracking-widest">Nama Konsumen</p>
+        <canvas id="canvas-customer" class="mb-1"></canvas>
+        <button type="button" onclick="padCustomer.clear()" class="no-print text-[8px] text-red-600 hover:underline mb-1">Hapus Tanda Tangan</button>
+
+        <div class="w-full border-t-2 border-gray-800 pt-1">
+            <span id="label-sign-customer" class="text-[10px] font-black uppercase">.................................</span>
+        </div>
+    </div>
+</div>
+
+            <div class="no-print mt-10">
+                <button onclick="window.print()" class="w-full bg-blue-900 hover:bg-black text-white py-4 font-black rounded-xl shadow-2xl uppercase text-sm tracking-widest transition-all transform hover:scale-[1.01]">
+                    Cetak BASTK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dataDokumen = ["STNK", "Buku Manual", "Buku Service", "Kartu Parkir"];
+        const dataPerlengkapan = [
+            "Kunci Utama", "AC", "Spion Dalam", "Spion Luar", "Karpet Depan", "Karpet Tengah", "Karpet Belakang",
+            "Klakson", "Head Lamp", "Stop Lamp", "Lampu Kabin", "Sein", "Audio",
+            "Head Unit", "Head Rest", "Antena", "Wipper", "Dop Roda", "P3K", "Sun Visor", 
+            "Penahan Lumpur", "Segitiga Pengaman", "APAR", "Ban Serep", "Dongkrak", "V2L Adapter", "Tool Set", "Charging Hyundai", "Tire Repair Kit", "Spoiler"
+        ];
+
+        let padPetugas, padCustomer;
+function handlePhotos(event) {
+    const files = event.target.files;
+    const printContainer = document.getElementById('printPhotoContainer');
+    const previewContainer = document.getElementById('photoPreview');
+    
+    printContainer.innerHTML = ''; 
+    previewContainer.innerHTML = '';
+
+    const filesArray = Array.from(files);
+    let loadedCount = 0;
+
+    filesArray.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // 1. Tambahkan ke Preview Layar
+            const pImg = document.createElement('img');
+            pImg.src = e.target.result;
+            pImg.className = 'preview-thumbnail';
+            previewContainer.appendChild(pImg);
+
+            // 2. Logika Halaman Cetak (8 foto per halaman)
+            const pageIndex = Math.floor(loadedCount / 8);
+            let currentPage = printContainer.children[pageIndex];
+
+            if (!currentPage) {
+                currentPage = document.createElement('div');
+                currentPage.className = 'photo-page';
+                printContainer.appendChild(currentPage);
+            }
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'print-photo-item';
+            currentPage.appendChild(img);
+
+            loadedCount++;
+        }
+        reader.readAsDataURL(file);
+    });
+}
+      
+        function initForm(status) {
+            document.getElementById('selection-step').classList.add('hidden');
+            document.getElementById('main-form').classList.remove('hidden');
+            document.getElementById('label-status').innerText = "UNIT " + status;
+            
+            renderWithNote('table-dokumen', dataDokumen, 0, 'dok');
+            
+            const half = Math.ceil(dataPerlengkapan.length / 2);
+            renderWithNote('table-perlengkapan-left', dataPerlengkapan.slice(0, half), 0, 'p');
+            renderWithNote('table-perlengkapan-right', dataPerlengkapan.slice(half), half, 'p');
+
+            setupCanvas();
+            
+            // Sync Nama TTD
+            document.getElementById('input-pic-petugas').addEventListener('input', (e) => {
+                document.getElementById('label-sign-petugas').innerText = e.target.value || '.................................';
+            });
+            document.getElementById('input-nama-konsumen').addEventListener('input', (e) => {
+                document.getElementById('label-sign-customer').innerText = e.target.value || '.................................';
+            });
+        }
+
+        function renderWithNote(id, data, start, prefix) {
+            const tbody = document.getElementById(id);
+            data.forEach((item, i) => {
+                // Menambahkan font-bold pada kolom item dan input keterangan
+                tbody.innerHTML += `<tr>
+                    <td class="text-center">${start + i + 1}</td>
+                    <td class="font-bold">${item}</td>
+                    <td class="text-center"><input type="radio" name="${prefix}_${start + i}"></td>
+                    <td class="text-center"><input type="radio" name="${prefix}_${start + i}"></td>
+                    <td><input type="text" class="text-[7.5px] font-bold"></td>
+                </tr>`;
+            });
+        }
+
+        function setupCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            ['canvas-petugas', 'canvas-customer'].forEach(id => {
+                const cvs = document.getElementById(id);
+                if (cvs) {
+                    cvs.width = cvs.offsetWidth * ratio;
+                    cvs.height = cvs.offsetHeight * ratio;
+                    cvs.getContext("2d").scale(ratio, ratio);
+                    if(id.includes('petugas')) padPetugas = new SignaturePad(cvs);
+                    else padCustomer = new SignaturePad(cvs);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
