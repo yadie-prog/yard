@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <style>
-    /* Reset & Dasar F4 (210 x 330 mm) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     @media print { 
@@ -76,7 +75,6 @@
     input:focus { outline: none; }
     .input-line { border-bottom: 1px solid #e2e8f0; }
 
-    /* Photo Grid Styling */
     .photo-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -241,8 +239,6 @@
             document.getElementById('input-nama-konsumen').addEventListener('input', (e) => {
                 document.getElementById('label-sign-customer').innerText = e.target.value || '.................................';
             });
-
-            // Handle Photo Upload
             document.getElementById('input-photos').addEventListener('change', handlePhotoUpload);
         }
 
@@ -272,7 +268,6 @@
                 });
             }));
 
-            // Logic 8 Photos per page
             for (let i = 0; i < photoData.length; i += 8) {
                 const pageDiv = document.createElement('div');
                 pageDiv.className = 'page-break mt-10';
