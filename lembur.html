@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>FORM Lembur - Hyundai Solusi Mobilitas</title>
+    <style>
+        :root {
+            --hyundai-navy: #002c5f;
+            --electric-blue: #00aad2;
+            --slate-600: #475569;
+            --slate-100: #f1f5f9;
+            --border-tech: #cbd5e1;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #e2e8f0; margin: 0; padding: 20px; }
+
+        /* Panel Input */
+        .input-panel {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        .input-group { display: flex; flex-direction: column; }
+        .full-width { grid-column: span 3; }
+        label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--hyundai-navy); margin-bottom: 6px; }
+        input, textarea { padding: 12px; border: 1px solid var(--border-tech); border-radius: 8px; font-size: 14px; transition: 0.3s; }
+        
+        .btn-print {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, var(--hyundai-navy) 0%, #004a87 100%);
+            color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+
+        #print-area { display: none; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .input-panel { display: none; }
+            @page { size: A4 portrait; margin: 0; }
+
+            #print-area { 
+                display: block; 
+                width: 210mm; 
+                height: 297mm; 
+            }
+
+            /* Container Duplicate */
+            .print-wrapper {
+                height: 148.5mm;
+                padding: 10mm;
+                box-sizing: border-box;
+                position: relative;
+                border-bottom: 1px dashed #ccc; /* Garis potong */
+                overflow: hidden;
+            }
+
+            .print-wrapper::before {
+                content: "";
+                position: absolute;
+                top: 0; right: 0;
+                width: 120mm; height: 100%;
+                background: linear-gradient(135deg, rgba(0,44,95,0.03) 0%, rgba(0,170,210,0.05) 100%);
+                z-index: -1;
+                clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 5px solid var(--hyundai-navy);
+                padding-left: 15px;
+                margin-bottom: 15px;
+            }
+            .logo-brand { font-size: 22pt; font-weight: 800; color: var(--hyundai-navy); letter-spacing: -1px; }
+            .logo-brand span { color: var(--electric-blue); }
+            .title-box { text-align: right; }
+            .title-box h1 { margin: 0; font-size: 16pt; text-transform: uppercase; color: var(--hyundai-navy); }
+            .title-box p { margin: 0; font-size: 8pt; color: var(--slate-600); }
+
+            .grid-container { display: flex; gap: 15px; height: 70mm; }
+            .data-side { flex: 2; }
+            .modern-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+            .modern-table td { padding: 8px 12px; font-size: 9pt; background: #f8fafc; }
+            .label-cell { 
+                width: 30%; 
+                font-weight: 700; 
+                color: white; 
+                background: var(--hyundai-navy) !important; 
+                border-radius: 4px 0 0 4px;
+                font-size: 7.5pt;
+                text-transform: uppercase;
+            }
+            .content-cell { 
+                border-right: 1px solid var(--border-tech);
+                border-top: 1px solid var(--border-tech);
+                border-bottom: 1px solid var(--border-tech);
+                border-radius: 0 4px 4px 0;
+            }
+
+            .photo-side { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+            .photo-label { font-size: 7pt; font-weight: 800; color: var(--hyundai-navy); text-align: center; }
+
+.photo-frame { 
+    height: 55mm; /* Memberikan tinggi pasti agar tidak terpotong ke bawah */
+    border: 2px solid var(--hyundai-navy);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+}
+
+.photo-frame img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; /* Mengatur agar foto utuh terlihat semua (tidak terpotong sisi-sisinya) */
+    background: #f8fafc;
+}
+            .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+            .signature-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .sig-item {
+                background: white;
+                border: 1px solid var(--border-tech);
+                border-radius: 6px;
+                padding: 5px;
+                text-align: center;
+            }
+            .sig-role { 
+                font-size: 7pt; 
+                font-weight: bold; 
+                color: var(--electric-blue); 
+                margin-bottom: 50px; 
+                border-bottom: 1px solid #eee; 
+                padding-bottom: 3px; 
+            }
+            .sig-name { font-size: 8pt; font-weight: bold; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="input-panel">
+    <h2 style="margin-top:0; color:var(--hyundai-navy)">E-Overtime Form</h2>
+    <div class="input-grid">
+        <div class="input-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="in_nama" placeholder="Contoh: manusia" oninput="updateData()">
+        </div>
+        <div class="input-group">
+            <label>Tanggal Tugas</label>
+            <input type="date" id="in_tgl" oninput="updateData()">
+        </div>
+        <div class="input-group">
+            <label>Divisi</label>
+            <input type="text" id="in_divisi" placeholder="Contoh: Operator" oninput="updateData()">
+        </div>
+        <div class="input-group">
+            <label>Jam Mulai (24H)</label>
+            <input type="time" id="in_mulai" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Jam Akhir (24H)</label>
+            <input type="time" id="in_akhir" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Department</label>
+            <input type="text" id="in_dept" placeholder="Contoh: HG TCCL" oninput="updateData()">
+        </div>
+        <div class="input-group">
+            <label>Upload Bukti</label>
+            <input type="file" id="in_foto" accept="image/*" onchange="handleImage(this)">
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+            <label>Kalkulasi Total</label>
+            <input type="text" id="in_total" readonly style="background: #f1f5f9; font-weight: bold; color: var(--electric-blue)">
+        </div>
+        <div class="input-group full-width">
+            <label>Alasan / Detail Pekerjaan</label>
+            <textarea id="in_reason" rows="2" placeholder="Jelaskan aktivitas lembur..." oninput="updateData()"></textarea>
+        </div>
+    </div>
+    <button class="btn-print" onclick="window.print()">PRINT BUKTI</button>
+</div>
+
+<div id="print-area">
+    <div id="form-top" class="print-wrapper"></div>
+    <div id="form-bottom" class="print-wrapper"></div>
+</div>
+
+<template id="form-content">
+    <div class="header">
+        <div class="logo-brand">HYUNDAI<span>.</span></div>
+        <div class="title-box">
+            <h1>OVERTIME AUTHORIZATION</h1>
+            <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
+        </div>
+    </div>
+    <div class="grid-container">
+        <div class="data-side">
+            <table class="modern-table">
+                <tr><td class="label-cell">Nama</td><td class="content-cell"><strong class="out_nama">-</strong></td></tr>
+                <tr><td class="label-cell">Tanggal</td><td class="content-cell out_tgl">-</td></tr>
+                <tr><td class="label-cell">Durasi</td><td class="content-cell out_waktu">-</td></tr>
+                <tr><td class="label-cell">Total</td><td class="content-cell out_total" style="color:var(--electric-blue); font-weight:800;">-</td></tr>
+                <tr><td class="label-cell">Div/Dept</td><td class="content-cell"><span class="out_divisi">-</span> / <span class="out_dept">-</span></td></tr>
+                <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:45px; vertical-align:top; font-size:8pt;">-</td></tr>
+            </table>
+        </div>
+        <div class="photo-side">
+            <div class="photo-label">EVIDENCE ATTACHMENT</div>
+            <div class="photo-frame"><img class="out_img" src=""></div>
+        </div>
+    </div>
+    <div class="signature-grid">
+        <div class="sig-item"><div class="sig-role">OPERATOR (REQUESTER)</div><div class="sig-name out_sig_nama">-</div></div>
+        <div class="sig-item"><div class="sig-role">LEAD (CHECKED)</div><div class="sig-name">Alfian Ubaidillah</div></div>
+        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Rahmadi</div></div>
+        <div class="sig-item"><div class="sig-role">MANAGER (APPROVED)</div><div class="sig-name">Johan Wahyudi</div></div>
+    </div>
+</template>
+
+<script>
+    // Inisialisasi struktur duplikat
+    const template = document.getElementById('form-content').innerHTML;
+    document.getElementById('form-top').innerHTML = template;
+    document.getElementById('form-bottom').innerHTML = template;
+
+    function updateData() {
+        const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason'];
+        fields.forEach(f => {
+            const val = document.getElementById('in_' + f).value;
+            document.querySelectorAll('.out_' + f).forEach(el => el.innerText = val || '-');
+            if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
+        });
+    }
+
+    function calculate() {
+        const s = document.getElementById('in_mulai').value;
+        const e = document.getElementById('in_akhir').value;
+        if(s && e) {
+            // Jam format 24 jam sudah standar di input type="time"
+            let start = new Date("2026-01-01 " + s);
+            let end = new Date("2026-01-01 " + e);
+            let diff = (end - start) / (1000 * 60 * 60);
+            if(diff < 0) diff += 24;
+            
+            const hasil = diff.toFixed(1) + " HOURS";
+            document.getElementById('in_total').value = hasil;
+            document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
+            document.querySelectorAll('.out_waktu').forEach(el => el.innerText = s + " - " + e);
+        }
+    }
+
+    function handleImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.querySelectorAll('.out_img').forEach(img => img.src = e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+</body>
+</html>
