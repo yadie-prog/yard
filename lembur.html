@@ -14,7 +14,6 @@
 
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #e2e8f0; margin: 0; padding: 20px; }
 
-        /* Responsivitas Container Utama */
         .input-panel {
             max-width: 900px;
             margin: 0 auto;
@@ -24,7 +23,6 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* Responsivitas Grid */
         .input-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
@@ -32,12 +30,11 @@
             margin-bottom: 25px; 
         }
 
-        /* Penyesuaian untuk layar Handphone/Tablet */
         @media screen and (max-width: 768px) {
             body { padding: 10px; }
             .input-panel { padding: 20px; border-radius: 12px; }
             .input-grid { 
-                grid-template-columns: 1fr; /* Jadi satu kolom di HP */
+                grid-template-columns: 1fr;
                 gap: 15px; 
             }
             .full-width, .input-group[style*="grid-column: span 2;"] { 
@@ -75,7 +72,7 @@
                 padding: 10mm;
                 box-sizing: border-box;
                 position: relative;
-                border-bottom: 1px dashed #ccc; /* Garis potong */
+                border-bottom: 1px dashed #ccc;
                 overflow: hidden;
             }
 
@@ -172,11 +169,11 @@
 <body>
 
 <div class="input-panel">
-    <h2 style="margin-top:0; color:var(--hyundai-navy)">E-Overtime Form</h2>
+    <h2 style="margin-top:0; color:var(--hyundai-navy)">Digital Overtime Form</h2>
     <div class="input-grid">
         <div class="input-group">
             <label>Nama Lengkap</label>
-            <input type="text" id="in_nama" placeholder="Contoh: manusia" oninput="updateData()">
+            <input type="text" id="in_nama" placeholder="Contoh: Manusia" oninput="updateData()">
         </div>
         <div class="input-group">
             <label>Tanggal Tugas</label>
@@ -187,11 +184,15 @@
             <input type="text" id="in_divisi" placeholder="Contoh: Operator" oninput="updateData()">
         </div>
         <div class="input-group">
-            <label>Jam Mulai (24H)</label>
+            <label>Jam Request</label>
+            <input type="text" id="in_req" placeholder="Contoh: 19.00 - 21.00" oninput="updateData()">
+        </div>
+        <div class="input-group">
+            <label>Jam Mulai Lembur</label>
             <input type="time" id="in_mulai" oninput="calculate()">
         </div>
         <div class="input-group">
-            <label>Jam Akhir (24H)</label>
+            <label>Jam Akhir Lembur</label>
             <input type="time" id="in_akhir" oninput="calculate()">
         </div>
         <div class="input-group">
@@ -207,7 +208,7 @@
             <input type="text" id="in_total" readonly style="background: #f1f5f9; font-weight: bold; color: var(--electric-blue)">
         </div>
         <div class="input-group full-width">
-            <label>Alasan / Detail Pekerjaan</label>
+            <label>Detail Pekerjaan</label>
             <textarea id="in_reason" rows="2" placeholder="Jelaskan aktivitas lembur..." oninput="updateData()"></textarea>
         </div>
     </div>
@@ -224,7 +225,7 @@
         <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai Logo" style="height:40px;"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
-            <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
+            <p>PT. Hyundai Solusi Mobilitas | Glovis Indonesia International</p>
         </div>
     </div>
     <div class="grid-container">
@@ -232,7 +233,8 @@
             <table class="modern-table">
                 <tr><td class="label-cell">Nama</td><td class="content-cell"><strong class="out_nama">-</strong></td></tr>
                 <tr><td class="label-cell">Tanggal</td><td class="content-cell out_tgl">-</td></tr>
-                <tr><td class="label-cell">Durasi</td><td class="content-cell out_waktu">-</td></tr>
+                <tr><td class="label-cell">Durasi Request</td><td class="content-cell out_req">-</td></tr>
+                <tr><td class="label-cell">Aktual</td><td class="content-cell out_waktu">-</td></tr>
                 <tr><td class="label-cell">Total</td><td class="content-cell out_total" style="color:var(--electric-blue); font-weight:800;">-</td></tr>
                 <tr><td class="label-cell">Div/Dept</td><td class="content-cell"><span class="out_divisi">-</span> / <span class="out_dept">-</span></td></tr>
                 <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:45px; vertical-align:top; font-size:8pt;">-</td></tr>
@@ -246,7 +248,7 @@
     <div class="signature-grid">
         <div class="sig-item"><div class="sig-role">OPERATOR (REQUESTER)</div><div class="sig-name out_sig_nama">-</div></div>
         <div class="sig-item"><div class="sig-role">LEAD (CHECKED)</div><div class="sig-name">Alfian Ubaidillah</div></div>
-        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Rahmadi</div></div>
+        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Putra Rahmadi</div></div>
         <div class="sig-item"><div class="sig-role">MANAGER (APPROVED)</div><div class="sig-name">Johan Wahyudi</div></div>
     </div>
 </template>
