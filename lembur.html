@@ -14,7 +14,6 @@
 
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #e2e8f0; margin: 0; padding: 20px; }
 
-        /* Panel Input */
         .input-panel {
             max-width: 900px;
             margin: 0 auto;
@@ -49,7 +48,6 @@
                 height: 297mm; 
             }
 
-            /* Container Duplicate */
             .print-wrapper {
                 height: 148.5mm;
                 padding: 10mm;
@@ -107,7 +105,7 @@
             .photo-label { font-size: 7pt; font-weight: 800; color: var(--hyundai-navy); text-align: center; }
 
 .photo-frame { 
-    height: 55mm; /* Memberikan tinggi pasti agar tidak terpotong ke bawah */
+    height: 55mm;
     border: 2px solid var(--hyundai-navy);
     border-radius: 8px;
     overflow: hidden;
@@ -120,7 +118,7 @@
 .photo-frame img { 
     width: 100%; 
     height: 100%; 
-    object-fit: contain; /* Mengatur agar foto utuh terlihat semua (tidak terpotong sisi-sisinya) */
+    object-fit: contain; 
     background: #f8fafc;
 }
             .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
@@ -202,7 +200,8 @@
 
 <template id="form-content">
     <div class="header">
-        <div class="logo-brand">HYUNDAI<span>.</span></div>
+        
+        <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai Logo" class="h-10 mb-2"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
             <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
