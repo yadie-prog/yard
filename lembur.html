@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>FORM Lembur - Hyundai Solusi Mobilitas</title>
-    <style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <style>
         :root {
             --hyundai-navy: #002c5f;
             --electric-blue: #00aad2;
@@ -14,6 +14,7 @@
 
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #e2e8f0; margin: 0; padding: 20px; }
 
+        /* Responsivitas Container Utama */
         .input-panel {
             max-width: 900px;
             margin: 0 auto;
@@ -23,11 +24,32 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        /* Responsivitas Grid */
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; 
+            margin-bottom: 25px; 
+        }
+
+        /* Penyesuaian untuk layar Handphone/Tablet */
+        @media screen and (max-width: 768px) {
+            body { padding: 10px; }
+            .input-panel { padding: 20px; border-radius: 12px; }
+            .input-grid { 
+                grid-template-columns: 1fr; /* Jadi satu kolom di HP */
+                gap: 15px; 
+            }
+            .full-width, .input-group[style*="grid-column: span 2;"] { 
+                grid-column: span 1 !important; 
+            }
+            .btn-print { font-size: 14px; padding: 14px; }
+        }
+
         .input-group { display: flex; flex-direction: column; }
         .full-width { grid-column: span 3; }
         label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--hyundai-navy); margin-bottom: 6px; }
-        input, textarea { padding: 12px; border: 1px solid var(--border-tech); border-radius: 8px; font-size: 14px; transition: 0.3s; }
+        input, textarea { padding: 12px; border: 1px solid var(--border-tech); border-radius: 8px; font-size: 14px; transition: 0.3s; width: 100%; box-sizing: border-box; }
         
         .btn-print {
             width: 100%; padding: 16px; background: linear-gradient(135deg, var(--hyundai-navy) 0%, #004a87 100%);
@@ -104,24 +126,23 @@
             .photo-side { flex: 1; display: flex; flex-direction: column; gap: 5px; }
             .photo-label { font-size: 7pt; font-weight: 800; color: var(--hyundai-navy); text-align: center; }
 
-.photo-frame { 
-    height: 55mm;
-    border: 2px solid var(--hyundai-navy);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-}
+            .photo-frame { 
+                height: 55mm;
+                border: 2px solid var(--hyundai-navy);
+                border-radius: 8px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #fff;
+            }
 
-.photo-frame img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: contain; 
-    background: #f8fafc;
-}
-            .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+            .photo-frame img { 
+                width: 100%; 
+                height: 100%; 
+                object-fit: contain; 
+                background: #f8fafc;
+            }
 
             .signature-grid {
                 display: grid;
@@ -200,8 +221,7 @@
 
 <template id="form-content">
     <div class="header">
-        
-        <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai Logo" class="h-10 mb-2"></div>
+        <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai Logo" style="height:40px;"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
             <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
@@ -232,7 +252,6 @@
 </template>
 
 <script>
-    // Inisialisasi struktur duplikat
     const template = document.getElementById('form-content').innerHTML;
     document.getElementById('form-top').innerHTML = template;
     document.getElementById('form-bottom').innerHTML = template;
@@ -250,7 +269,6 @@
         const s = document.getElementById('in_mulai').value;
         const e = document.getElementById('in_akhir').value;
         if(s && e) {
-            // Jam format 24 jam sudah standar di input type="time"
             let start = new Date("2026-01-01 " + s);
             let end = new Date("2026-01-01 " + e);
             let diff = (end - start) / (1000 * 60 * 60);
