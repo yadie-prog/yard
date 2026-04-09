@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <style>
         :root {
-            /* Palette Warna Baru: Soft Dark Mode untuk UI */
             --hyundai-navy: #002c5f;
             --electric-blue: #00aad2;
             --bg-dark: #1e293b; /* Slate 800 */
@@ -15,8 +14,6 @@
             --text-light: #f1f5f9;
             --border-tech: #64748b;
         }
-
-        /* --- UI FORM STYLING (Mobile Optimized) --- */
         body { 
             font-family: 'Inter', 'Segoe UI', sans-serif; 
             background: var(--bg-dark); 
@@ -51,7 +48,6 @@
             margin-bottom: 20px; 
         }
 
-        /* Responsivitas Handphone */
         @media screen and (max-width: 600px) {
             .input-grid { grid-template-columns: 1fr; }
             .full-mobile { grid-column: span 1 !important; }
@@ -107,7 +103,6 @@
 
         .btn-print:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 170, 210, 0.4); }
 
-        /* --- PRINT AREA (DI-PRESERVE SESUAI ASLI) --- */
         #print-area { display: none; }
 
         @media print {
@@ -147,7 +142,7 @@
 <div class="input-panel">
     <div class="form-header">
         <h2>E-Overtime</h2>
-        <p>PT. Hyundai Solusi Mobilitas - Digital Portal</p>
+        <p>PT. Hyundai Solusi Mobilitas - Glovis Indonesia International</p>
     </div>
 
     <div class="input-grid">
@@ -217,7 +212,7 @@
         <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
-            <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
+            <p>PT. Hyundai Solusi Mobilitas | GII</p>
         </div>
     </div>
     <div class="grid-container">
@@ -259,23 +254,36 @@
         });
     }
 
-    function calculate() {
-        const s = document.getElementById('in_req_mulai').value;
-        const e = document.getElementById('in_req_akhir').value;
-        if(s && e) {
-            let start = new Date("2026-01-01 " + s);
-            let end = new Date("2026-01-01 " + e);
-            let diff = (end - start) / (1000 * 60 * 60);
-            if(diff < 0) diff += 24;
-            
-            const hasil = diff.toFixed(1) + " HOURS";
-            document.getElementById('in_total').value = hasil;
-            document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
-            document.querySelectorAll('.out_waktu').forEach(el => el.innerText = s + " - " + e);
-        }
-        updateData();
+function calculate() {
+    // 1. Ambil data Request untuk perhitungan Jam Lembur
+    const reqS = document.getElementById('in_req_mulai').value;
+    const reqE = document.getElementById('in_req_akhir').value;
+
+    // 2. Ambil data Absensi Real untuk ditampilkan di hasil print "WAKTU ABSENSI"
+    const absIn = document.getElementById('in_mulai').value;
+    const absOut = document.getElementById('in_akhir').value;
+
+    // Hitung Total Jam berdasarkan Request
+    if(reqS && reqE) {
+        let start = new Date("2026-01-01 " + reqS);
+        let end = new Date("2026-01-01 " + reqE);
+        let diff = (end - start) / (1000 * 60 * 60);
+        if(diff < 0) diff += 24;
+        
+        const hasil = diff.toFixed(1) + " HOURS";
+        document.getElementById('in_total').value = hasil;
+        document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
     }
 
+    // UPDATE: Tampilkan Waktu Absensi Real (bukan request) ke lembar print
+    if(absIn && absOut) {
+        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = absIn + " - " + absOut);
+    } else {
+        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = "-");
+    }
+
+    updateData();
+}
     function handleImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
