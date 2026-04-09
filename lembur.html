@@ -296,16 +296,6 @@ function calculate() {
 
     updateData();
 }
-
-    // UPDATE: Tampilkan Waktu Absensi Real (bukan request) ke lembar print
-    if(absIn && absOut) {
-        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = absIn + " - " + absOut);
-    } else {
-        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = "-");
-    }
-
-    updateData();
-}
     function handleImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
