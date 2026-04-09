@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>FORM Lembur - Hyundai Solusi Mobilitas</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <style>
         :root {
             --hyundai-navy: #002c5f;
             --electric-blue: #00aad2;
@@ -40,7 +41,6 @@
             .full-width, .input-group[style*="grid-column: span 2;"] { 
                 grid-column: span 1 !important; 
             }
-            .btn-print { font-size: 14px; padding: 14px; }
         }
 
         .input-group { display: flex; flex-direction: column; }
@@ -95,8 +95,6 @@
                 margin-bottom: 15px;
             }
             .logo-brand { font-size: 22pt; font-weight: 800; color: var(--hyundai-navy); letter-spacing: -1px; }
-            .logo-brand span { color: var(--electric-blue); }
-            .title-box { text-align: right; }
             .title-box h1 { margin: 0; font-size: 16pt; text-transform: uppercase; color: var(--hyundai-navy); }
             .title-box p { margin: 0; font-size: 8pt; color: var(--slate-600); }
 
@@ -120,11 +118,14 @@
                 border-radius: 0 4px 4px 0;
             }
 
-            .photo-side { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+            .photo-side { flex: 1.2; display: flex; flex-direction: column; gap: 5px; }
             .photo-label { font-size: 7pt; font-weight: 800; color: var(--hyundai-navy); text-align: center; }
 
+            /* Format 4:3 (Contoh: 60mm x 45mm) agar tidak terpotong */
             .photo-frame { 
-                height: 55mm;
+                width: 60mm;
+                height: 45mm;
+                margin: 0 auto;
                 border: 2px solid var(--hyundai-navy);
                 border-radius: 8px;
                 overflow: hidden;
@@ -137,7 +138,7 @@
             .photo-frame img { 
                 width: 100%; 
                 height: 100%; 
-                object-fit: contain; 
+                object-fit: contain; /* Memastikan foto tidak terpotong */
                 background: #f8fafc;
             }
 
@@ -158,7 +159,7 @@
                 font-size: 7pt; 
                 font-weight: bold; 
                 color: var(--electric-blue); 
-                margin-bottom: 50px; 
+                margin-bottom: 45px; 
                 border-bottom: 1px solid #eee; 
                 padding-bottom: 3px; 
             }
@@ -166,14 +167,14 @@
         }
     </style>
 </head>
-<body>
+<body onload="updateData()">
 
 <div class="input-panel">
-    <h2 style="margin-top:0; color:var(--hyundai-navy)">Digital Overtime Form</h2>
+    <h2 style="margin-top:0; color:var(--hyundai-navy)">E-Overtime Form</h2>
     <div class="input-grid">
         <div class="input-group">
             <label>Nama Lengkap</label>
-            <input type="text" id="in_nama" placeholder="Contoh: Manusia" oninput="updateData()">
+            <input type="text" id="in_nama" placeholder="Nama Anda..." oninput="updateData()">
         </div>
         <div class="input-group">
             <label>Tanggal Tugas</label>
@@ -183,28 +184,39 @@
             <label>Divisi</label>
             <input type="text" id="in_divisi" placeholder="Contoh: Operator" oninput="updateData()">
         </div>
+
         <div class="input-group">
-            <label>Jam Mulai Lembur</label>
-            <input type="time" id="in_mulai" oninput="calculate()">
+            <label>Request Jam Mulai</label>
+            <input type="time" id="in_req_mulai" oninput="updateData()">
         </div>
         <div class="input-group">
-            <label>Jam Akhir Lembur</label>
-            <input type="time" id="in_akhir" oninput="calculate()">
+            <label>Request Jam Selesai</label>
+            <input type="time" id="in_req_akhir" oninput="updateData()">
         </div>
         <div class="input-group">
             <label>Department</label>
-            <input type="text" id="in_dept" placeholder="Contoh: HG TCCL" oninput="updateData()">
+            <input type="text" id="in_dept" value="HG CCL" oninput="updateData()">
+        </div>
+
+        <div class="input-group">
+            <label>Absensi IN</label>
+            <input type="time" id="in_mulai" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Absensi Out</label>
+            <input type="time" id="in_akhir" oninput="calculate()">
         </div>
         <div class="input-group">
             <label>Upload Bukti</label>
             <input type="file" id="in_foto" accept="image/*" onchange="handleImage(this)">
         </div>
-        <div class="input-group" style="grid-column: span 2;">
-            <label>Kalkulasi Total</label>
+
+        <div class="input-group" style="grid-column: span 3;">
+            <label>TOTAL JAM LEMBUR</label>
             <input type="text" id="in_total" readonly style="background: #f1f5f9; font-weight: bold; color: var(--electric-blue)">
         </div>
         <div class="input-group full-width">
-            <label>Detail Pekerjaan</label>
+            <label>Alasan / Detail Pekerjaan</label>
             <textarea id="in_reason" rows="2" placeholder="Jelaskan aktivitas lembur..." oninput="updateData()"></textarea>
         </div>
     </div>
@@ -221,7 +233,7 @@
         <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai Logo" style="height:40px;"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
-            <p>PT. Hyundai Solusi Mobilitas | Glovis Indonesia International</p>
+            <p>PT. Hyundai Solusi Mobilitas | Digital Document v.2026</p>
         </div>
     </div>
     <div class="grid-container">
@@ -229,10 +241,11 @@
             <table class="modern-table">
                 <tr><td class="label-cell">Nama</td><td class="content-cell"><strong class="out_nama">-</strong></td></tr>
                 <tr><td class="label-cell">Tanggal</td><td class="content-cell out_tgl">-</td></tr>
-                <tr><td class="label-cell">Aktual</td><td class="content-cell out_waktu">-</td></tr>
-                <tr><td class="label-cell">Total</td><td class="content-cell out_total" style="color:var(--electric-blue); font-weight:800;">-</td></tr>
-                <tr><td class="label-cell">Div/Dept</td><td class="content-cell"><span class="out_divisi">-</span> / <span class="out_dept">-</span></td></tr>
-                <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:45px; vertical-align:top; font-size:8pt;">-</td></tr>
+                <tr><td class="label-cell">Request</td><td class="content-cell"><span class="out_req_mulai">-</span> s/d <span class="out_req_akhir">-</span></td></tr>
+                <tr><td class="label-cell">Waktu Absensi</td><td class="content-cell out_waktu">-</td></tr>
+                <tr><td class="label-cell">Total LEMBUR</td><td class="content-cell out_total" style="color:var(--electric-blue); font-weight:800;">-</td></tr>
+                <tr><td class="label-cell">Div. / Dept</td><td class="content-cell"><span class="out_divisi">-</span> / <span class="out_dept">-</span></td></tr>
+                <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:35px; vertical-align:top; font-size:8pt;">-</td></tr>
             </table>
         </div>
         <div class="photo-side">
@@ -243,7 +256,7 @@
     <div class="signature-grid">
         <div class="sig-item"><div class="sig-role">OPERATOR (REQUESTER)</div><div class="sig-name out_sig_nama">-</div></div>
         <div class="sig-item"><div class="sig-role">LEAD (CHECKED)</div><div class="sig-name">Alfian Ubaidillah</div></div>
-        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Putra Rahmadi</div></div>
+        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Rahmadi</div></div>
         <div class="sig-item"><div class="sig-role">MANAGER (APPROVED)</div><div class="sig-name">Johan Wahyudi</div></div>
     </div>
 </template>
@@ -254,7 +267,7 @@
     document.getElementById('form-bottom').innerHTML = template;
 
     function updateData() {
-        const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason'];
+        const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
         fields.forEach(f => {
             const val = document.getElementById('in_' + f).value;
             document.querySelectorAll('.out_' + f).forEach(el => el.innerText = val || '-');
@@ -263,8 +276,8 @@
     }
 
     function calculate() {
-        const s = document.getElementById('in_mulai').value;
-        const e = document.getElementById('in_akhir').value;
+        const s = document.getElementById('in_req_mulai').value;
+        const e = document.getElementById('in_req_akhir').value;
         if(s && e) {
             let start = new Date("2026-01-01 " + s);
             let end = new Date("2026-01-01 " + e);
@@ -276,6 +289,7 @@
             document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
             document.querySelectorAll('.out_waktu').forEach(el => el.innerText = s + " - " + e);
         }
+        updateData();
     }
 
     function handleImage(input) {
