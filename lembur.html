@@ -195,11 +195,11 @@
 
         <div class="input-group span-2 full-mobile">
             <label>Detail Aktivitas</label>
-            <textarea id="in_reason" rows="3" placeholder="Apa yang Anda kerjakan?" oninput="updateData()"></textarea>
+            <textarea id="in_reason" rows="3" placeholder="Detail Tugas...." oninput="updateData()"></textarea>
         </div>
     </div>
     
-    <button class="btn-print" onclick="window.print()">Cetak Lembar Lembur</button>
+    <button class="btn-print" onclick="window.print()">Cetak Form Lembur</button>
 </div>
 
 <div id="print-area">
@@ -255,11 +255,9 @@
     }
 
 function calculate() {
-    // 1. Ambil data Request untuk perhitungan Jam Lembur
     const reqS = document.getElementById('in_req_mulai').value;
     const reqE = document.getElementById('in_req_akhir').value;
 
-    // 2. Ambil data Absensi Real untuk ditampilkan di hasil print
     const absIn = document.getElementById('in_mulai').value;
     const absOut = document.getElementById('in_akhir').value;
 
@@ -268,26 +266,20 @@ function calculate() {
         let end = new Date("2026-01-01 " + reqE);
         let diff = (end - start) / (1000 * 60 * 60);
         
-        // Menangani lembur yang melewati tengah malam
         if(diff < 0) diff += 24;
         
         let hasil;
-        /* RUMUS KONDISI: 
-           Jika diff > 8 tampilkan "FULL DAY", 
-           jika tidak, tampilkan angka jamnya. 
-        */
+        
         if (diff > 8) {
             hasil = "FULL DAY";
         } else {
             hasil = diff.toFixed(1) + " HOURS";
         }
         
-        // Update ke input form dan tampilan print
         document.getElementById('in_total').value = hasil;
         document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
     }
 
-    // Tampilkan Waktu Absensi Real di lembar print
     if(absIn && absOut) {
         document.querySelectorAll('.out_waktu').forEach(el => el.innerText = absIn + " - " + absOut);
     } else {
