@@ -5,6 +5,7 @@
     <title>FORM Lembur - Hyundai Solusi Mobilitas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <style>
+
         :root {
             --hyundai-navy: #002c5f;
             --electric-blue: #00aad2;
@@ -64,17 +65,18 @@
             color: var(--electric-blue);
         }
 
-        input, textarea { 
-            padding: 14px; 
-            background: var(--input-bg);
-            border: 1px solid var(--border-tech); 
-            border-radius: 12px; 
-            font-size: 15px; 
-            color: white;
-            transition: all 0.2s; 
-            width: 100%; 
-            box-sizing: border-box; 
-        }
+input, select, textarea { 
+    padding: 14px; 
+    background: var(--input-bg);
+    border: 1px solid var(--border-tech); 
+    border-radius: 12px; 
+    font-size: 15px; 
+    color: white;
+    transition: all 0.2s; 
+    width: 100%; 
+    box-sizing: border-box; 
+    appearance: none;
+}
 
         input:focus, textarea:focus {
             outline: none;
@@ -148,7 +150,14 @@
     <div class="input-grid">
         <div class="input-group span-2 full-mobile">
             <label>Nama Lengkap</label>
-            <input type="text" id="in_nama" placeholder="Masukkan nama..." oninput="updateData()">
+         <select id="in_nama" onchange="updateData()">
+    <option value="">-- Pilih Nama --</option>
+    <option value="Derry Aditya Royadi">Alfian Ubaidillah</option>
+    <option value="Cecep Iwan Setiawan">Arfian Efendi</option>
+    <option value="Misto">Cecep Iwan Setiawan</option>
+    <option value="Arfian Efendi">Derry Aditya Royadi</option>
+    <option value="Alfian Ubaidillah">Misto</option>
+</select>
         </div>
 
         <div class="input-group">
@@ -161,11 +170,11 @@
         </div>
 
         <div class="input-group">
-            <label>Req. Mulai</label>
+            <label>Jam Mulai Lembur</label>
             <input type="time" id="in_req_mulai" oninput="calculate()">
         </div>
         <div class="input-group">
-            <label>Req. Selesai</label>
+            <label>Jam Akhir Lembur</label>
             <input type="time" id="in_req_akhir" oninput="calculate()">
         </div>
 
@@ -180,7 +189,11 @@
 
         <div class="input-group span-2 full-mobile">
             <label>Divisi / Jabatan</label>
-            <input type="text" id="in_divisi" placeholder="Contoh: Operator" oninput="updateData()">
+            <select id="in_divisi" onchange="updateData()">
+    <option value="">-- Pilih Divisi --</option>
+    <option value="Operator">Operator</option>
+    <option value="Admin">Admin</option>
+</select>
         </div>
 
         <div class="input-group span-2 full-mobile">
@@ -245,15 +258,28 @@
     document.getElementById('form-top').innerHTML = template;
     document.getElementById('form-bottom').innerHTML = template;
 
-    function updateData() {
-        const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
-        fields.forEach(f => {
-            const val = document.getElementById('in_' + f).value;
-            document.querySelectorAll('.out_' + f).forEach(el => el.innerText = val || '-');
-            if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
-        });
-    }
+function updateData() {
+    const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
+    fields.forEach(f => {
+        let val = document.getElementById('in_' + f).value;
+        
+        // Logika tambahan untuk format tanggal Indonesia
+        if (f === 'tgl' && val) {
+            const dateObj = new Date(val);
+            const months = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = months[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+            val = `${day} ${month} ${year}`;
+        }
 
+        document.querySelectorAll('.out_' + f).forEach(el => el.innerText = val || '-');
+        if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
+    });
+}
 function calculate() {
     const reqS = document.getElementById('in_req_mulai').value;
     const reqE = document.getElementById('in_req_akhir').value;
