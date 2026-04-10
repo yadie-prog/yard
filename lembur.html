@@ -254,67 +254,22 @@ input, select, textarea {
 </template>
 
 <script>
-// URL Spreadsheet yang Anda berikan
+// 1. KONFIGURASI GLOBAL
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaLf-fbX8KXkoJNY_g_XZAk9tQ9TNfsIuRzugLJ2PmAILBFG9o2wO7Pdtmfnx4axNDRA/exec";
 
-async function prosesLembur() {
-    const btn = document.getElementById('btnSubmit');
-    const nama = document.getElementById('in_nama').value;
-
-    // Validasi dasar
-    if (!nama) {
-        alert("Pilih nama terlebih dahulu!");
-        return;
-    }
-
-    // Ubah status tombol agar user tahu proses sedang berjalan
-    btn.innerText = "Sedang Memproses...";
-    btn.disabled = true;
-
-    // 1. Siapkan data sesuai kolom spreadsheet yang diminta
-    const formData = new FormData();
-    formData.append("nama", nama); // Kolom A2
-    formData.append("div_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); // Kolom B2
-    formData.append("tanggal", document.getElementById('in_tgl').value); // Kolom C2
-    formData.append("waktu_absen", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); // Kolom D2
-    formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); // Kolom E2
-    formData.append("total", document.getElementById('in_total').value); // Kolom F2
-    formData.append("aktivitas", document.getElementById('in_reason').value); // Kolom G2
-
-    try {
-        // 2. Kirim data ke Spreadsheet secara background
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors' // Gunakan no-cors untuk menghindari masalah kebijakan browser
-        });
-
-        // 3. Setelah berhasil kirim, jalankan perintah cetak
-        console.log("Data terkirim ke spreadsheet");
-        window.print();
-
-    } catch (error) {
-        console.error("Gagal mengirim data:", error);
-        alert("Data gagal disimpan, tapi Anda tetap bisa mencetak.");
-        window.print();
-    } finally {
-        // Kembalikan tombol ke semula
-        btn.innerText = "Cetak & Simpan Data";
-        btn.disabled = false;
-    }
-}
-
+// 2. INITIALIZE TEMPLATE (Jalankan saat load)
 const template = document.getElementById('form-content').innerHTML;
 document.getElementById('form-top').innerHTML = template;
 document.getElementById('form-bottom').innerHTML = template;
 
-// URL Web App Google Apps Script Anda
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaLf-fbX8KXkoJNY_g_XZAk9tQ9TNfsIuRzugLJ2PmAILBFG9o2wO7Pdtmfnx4axNDRA/exec";
-
+// 3. FUNGSI UPDATE TAMPILAN (Real-time)
 function updateData() {
     const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
     fields.forEach(f => {
-        let val = document.getElementById('in_' + f).value;
+        let elInput = document.getElementById('in_' + f);
+        if (!elInput) return;
+        
+        let val = elInput.value;
         
         if (f === 'tgl' && val) {
             const dateObj = new Date(val);
@@ -330,6 +285,7 @@ function updateData() {
     });
 }
 
+// 4. FUNGSI HITUNG OTOMATIS (Total Jam)
 function calculate() {
     const reqS = document.getElementById('in_req_mulai').value;
     const reqE = document.getElementById('in_req_akhir').value;
@@ -337,11 +293,18 @@ function calculate() {
     const absOut = document.getElementById('in_akhir').value;
 
     if(reqS && reqE) {
-        let start = new Date("2026-01-01 " + reqS);
-        let end = new Date("2026-01-01 " + reqE);
-        let diff = (end - start) / (1000 * 60 * 60);
-        if(diff < 0) diff += 24;
-        let hasil = diff > 8 ? "FULL DAY" : diff.toFixed(1) + " HOURS";
+        // Gunakan tanggal dummy untuk kalkulasi selisih jam
+        let start = new Date("2026-01-01T" + reqS);
+        let end = new Date("2026-01-01T" + reqE);
+        
+        // Jika lembur melewati tengah malam
+        if (end < start) end.setDate(end.getDate() + 1);
+        
+        let diffMs = end - start;
+        let diffHrs = diffMs / (1000 * 60 * 60);
+        
+        let hasil = diffHrs >= 8 ? "FULL DAY" : diffHrs.toFixed(1) + " HOURS";
+        
         document.getElementById('in_total').value = hasil;
         document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
     }
@@ -352,6 +315,7 @@ function calculate() {
     updateData();
 }
 
+// 5. HANDLING GAMBAR
 function handleImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -362,45 +326,52 @@ function handleImage(input) {
     }
 }
 
-// FUNGSI UTAMA UNTUK KIRIM DATA
-function sendToSpreadsheet() {
+// 6. FUNGSI UTAMA: SIMPAN & CETAK
+async function prosesLembur() {
     const btn = document.getElementById('btnSubmit');
     const nama = document.getElementById('in_nama').value;
-    
-    if(!nama) {
+
+    if (!nama) {
         alert("Pilih nama terlebih dahulu!");
         return;
     }
 
-    btn.innerText = "Mengirim...";
+    btn.innerText = "Mengirim Data...";
     btn.disabled = true;
 
-    // Siapkan Data sesuai pemetaan kolom Anda
+    // Persiapan Data untuk Spreadsheet
     const formData = new FormData();
-    formData.append("nama", nama); // Masuk ke Kolom A
-    formData.append("divisi_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); // Masuk ke Kolom B
-    formData.append("tanggal", document.getElementById('in_tgl').value); // Masuk ke Kolom C
-    formData.append("waktu_absensi", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); // Masuk ke Kolom D
-    formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); // Masuk ke Kolom E
-    formData.append("total_lembur", document.getElementById('in_total').value); // Masuk ke Kolom F
-    formData.append("aktivitas", document.getElementById('in_reason').value); // Masuk ke Kolom G
+    formData.append("nama", nama); 
+    formData.append("div_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); 
+    formData.append("tanggal", document.getElementById('in_tgl').value); 
+    formData.append("waktu_absen", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); 
+    formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); 
+    formData.append("total", document.getElementById('in_total').value); 
+    formData.append("aktivitas", document.getElementById('in_reason').value); 
 
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => {
-        alert("Data berhasil tersimpan di Tab: dataabsenlembur");
-        btn.innerText = "Simpan ke Spreadsheet";
+    try {
+        // Kirim ke Google Sheets
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' 
+        });
+
+        // Jalankan Print setelah kirim (atau tanpa menunggu response karena no-cors)
+        setTimeout(() => {
+            window.print();
+            btn.innerText = "Cetak & Simpan Data";
+            btn.disabled = false;
+        }, 500);
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Gagal menyimpan ke spreadsheet, tapi Anda tetap bisa mencetak.");
+        window.print();
         btn.disabled = false;
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Terjadi kesalahan saat mengirim data.");
-        btn.innerText = "Coba Lagi";
-        btn.disabled = false;
-    });
-}</script>
+    }
+}
+</script>
 
 </body>
 </html>
