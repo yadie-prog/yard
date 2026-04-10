@@ -212,8 +212,7 @@ input, select, textarea {
         </div>
     </div>
     
-<button class="btn-print" onclick="window.print()">Cetak Form Lembur</button>
-<button class="btn-print" id="btnSubmit" onclick="sendToSpreadsheet()" style="background: #10b981; margin-top: 10px;">Simpan ke Spreadsheet</button>
+<button class="btn-print" id="btnSubmit" onclick="prosesLembur()">Cetak & Simpan Data</button>
 </div>
 
 <div id="print-area">
@@ -255,6 +254,56 @@ input, select, textarea {
 </template>
 
 <script>
+// URL Spreadsheet yang Anda berikan
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaLf-fbX8KXkoJNY_g_XZAk9tQ9TNfsIuRzugLJ2PmAILBFG9o2wO7Pdtmfnx4axNDRA/exec";
+
+async function prosesLembur() {
+    const btn = document.getElementById('btnSubmit');
+    const nama = document.getElementById('in_nama').value;
+
+    // Validasi dasar
+    if (!nama) {
+        alert("Pilih nama terlebih dahulu!");
+        return;
+    }
+
+    // Ubah status tombol agar user tahu proses sedang berjalan
+    btn.innerText = "Sedang Memproses...";
+    btn.disabled = true;
+
+    // 1. Siapkan data sesuai kolom spreadsheet yang diminta
+    const formData = new FormData();
+    formData.append("nama", nama); // Kolom A2
+    formData.append("div_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); // Kolom B2
+    formData.append("tanggal", document.getElementById('in_tgl').value); // Kolom C2
+    formData.append("waktu_absen", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); // Kolom D2
+    formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); // Kolom E2
+    formData.append("total", document.getElementById('in_total').value); // Kolom F2
+    formData.append("aktivitas", document.getElementById('in_reason').value); // Kolom G2
+
+    try {
+        // 2. Kirim data ke Spreadsheet secara background
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' // Gunakan no-cors untuk menghindari masalah kebijakan browser
+        });
+
+        // 3. Setelah berhasil kirim, jalankan perintah cetak
+        console.log("Data terkirim ke spreadsheet");
+        window.print();
+
+    } catch (error) {
+        console.error("Gagal mengirim data:", error);
+        alert("Data gagal disimpan, tapi Anda tetap bisa mencetak.");
+        window.print();
+    } finally {
+        // Kembalikan tombol ke semula
+        btn.innerText = "Cetak & Simpan Data";
+        btn.disabled = false;
+    }
+}
+
 const template = document.getElementById('form-content').innerHTML;
 document.getElementById('form-top').innerHTML = template;
 document.getElementById('form-bottom').innerHTML = template;
