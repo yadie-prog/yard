@@ -212,7 +212,8 @@ input, select, textarea {
         </div>
     </div>
     
-    <button class="btn-print" onclick="window.print()">Cetak Form Lembur</button>
+<button class="btn-print" onclick="window.print()">Cetak Form Lembur</button>
+<button class="btn-print" id="btnSubmit" onclick="sendToSpreadsheet()" style="background: #10b981; margin-top: 10px;">Simpan ke Spreadsheet</button>
 </div>
 
 <div id="print-area">
@@ -254,22 +255,21 @@ input, select, textarea {
 </template>
 
 <script>
-    const template = document.getElementById('form-content').innerHTML;
-    document.getElementById('form-top').innerHTML = template;
-    document.getElementById('form-bottom').innerHTML = template;
+const template = document.getElementById('form-content').innerHTML;
+document.getElementById('form-top').innerHTML = template;
+document.getElementById('form-bottom').innerHTML = template;
+
+// URL Web App Google Apps Script Anda
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaLf-fbX8KXkoJNY_g_XZAk9tQ9TNfsIuRzugLJ2PmAILBFG9o2wO7Pdtmfnx4axNDRA/exec";
 
 function updateData() {
     const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
     fields.forEach(f => {
         let val = document.getElementById('in_' + f).value;
         
-        // Logika tambahan untuk format tanggal Indonesia
         if (f === 'tgl' && val) {
             const dateObj = new Date(val);
-            const months = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const day = String(dateObj.getDate()).padStart(2, '0');
             const month = months[dateObj.getMonth()];
             const year = dateObj.getFullYear();
@@ -280,10 +280,10 @@ function updateData() {
         if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
     });
 }
+
 function calculate() {
     const reqS = document.getElementById('in_req_mulai').value;
     const reqE = document.getElementById('in_req_akhir').value;
-
     const absIn = document.getElementById('in_mulai').value;
     const absOut = document.getElementById('in_akhir').value;
 
@@ -291,39 +291,67 @@ function calculate() {
         let start = new Date("2026-01-01 " + reqS);
         let end = new Date("2026-01-01 " + reqE);
         let diff = (end - start) / (1000 * 60 * 60);
-        
         if(diff < 0) diff += 24;
-        
-        let hasil;
-        
-        if (diff > 8) {
-            hasil = "FULL DAY";
-        } else {
-            hasil = diff.toFixed(1) + " HOURS";
-        }
-        
+        let hasil = diff > 8 ? "FULL DAY" : diff.toFixed(1) + " HOURS";
         document.getElementById('in_total').value = hasil;
         document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
     }
 
     if(absIn && absOut) {
         document.querySelectorAll('.out_waktu').forEach(el => el.innerText = absIn + " - " + absOut);
-    } else {
-        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = "-");
     }
-
     updateData();
 }
-    function handleImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                document.querySelectorAll('.out_img').forEach(img => img.src = e.target.result);
-            }
-            reader.readAsDataURL(input.files[0]);
+
+function handleImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.querySelectorAll('.out_img').forEach(img => img.src = e.target.result);
         }
+        reader.readAsDataURL(input.files[0]);
     }
-</script>
+}
+
+// FUNGSI UTAMA UNTUK KIRIM DATA
+function sendToSpreadsheet() {
+    const btn = document.getElementById('btnSubmit');
+    const nama = document.getElementById('in_nama').value;
+    
+    if(!nama) {
+        alert("Pilih nama terlebih dahulu!");
+        return;
+    }
+
+    btn.innerText = "Mengirim...";
+    btn.disabled = true;
+
+    // Siapkan Data sesuai pemetaan kolom Anda
+    const formData = new FormData();
+    formData.append("nama", nama); // Masuk ke Kolom A
+    formData.append("divisi_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); // Masuk ke Kolom B
+    formData.append("tanggal", document.getElementById('in_tgl').value); // Masuk ke Kolom C
+    formData.append("waktu_absensi", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); // Masuk ke Kolom D
+    formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); // Masuk ke Kolom E
+    formData.append("total_lembur", document.getElementById('in_total').value); // Masuk ke Kolom F
+    formData.append("aktivitas", document.getElementById('in_reason').value); // Masuk ke Kolom G
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => {
+        alert("Data berhasil tersimpan di Tab: dataabsenlembur");
+        btn.innerText = "Simpan ke Spreadsheet";
+        btn.disabled = false;
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan saat mengirim data.");
+        btn.innerText = "Coba Lagi";
+        btn.disabled = false;
+    });
+}</script>
 
 </body>
 </html>
