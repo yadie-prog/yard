@@ -293,17 +293,19 @@ function calculate() {
     const absOut = document.getElementById('in_akhir').value;
 
     if(reqS && reqE) {
-        // Gunakan tanggal dummy untuk kalkulasi selisih jam
         let start = new Date("2026-01-01T" + reqS);
         let end = new Date("2026-01-01T" + reqE);
         
-        // Jika lembur melewati tengah malam
         if (end < start) end.setDate(end.getDate() + 1);
         
         let diffMs = end - start;
         let diffHrs = diffMs / (1000 * 60 * 60);
         
-        let hasil = diffHrs >= 8 ? "FULL DAY" : diffHrs.toFixed(1) + " HOURS";
+        // --- LOGIKA PEMBULATAN KE BAWAH PER 0.5 JAM ---
+        // Math.floor(diffHrs * 2) / 2 akan membulatkan ke 0.5 terdekat di bawahnya
+        let roundedHrs = Math.floor(diffHrs * 2) / 2;
+        
+        let hasil = roundedHrs >= 8 ? "FULL DAY" : roundedHrs.toFixed(1) + " HOURS";
         
         document.getElementById('in_total').value = hasil;
         document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
@@ -314,7 +316,6 @@ function calculate() {
     }
     updateData();
 }
-
 // 5. HANDLING GAMBAR
 function handleImage(input) {
     if (input.files && input.files[0]) {
