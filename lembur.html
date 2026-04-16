@@ -129,10 +129,10 @@
             .content-cell { border: 1px solid #cbd5e1; border-left: none; }
             .photo-frame { width: 60mm; height: 70mm; border: 2px solid #002c5f; overflow: hidden; }
             .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
-            .signature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-            .sig-item { border: 1px solid #cbd5e1; padding: 5px; text-align: center; }
-            .sig-role { font-size: 7pt; font-weight: bold; color: #00aad2; margin-bottom: 40px; border-bottom: 1px solid #eee; }
-            .sig-name { font-size: 8pt; font-weight: bold; }
+            .signature-grid {display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px;}
+            .sig-item { border: 1px solid #cbd5e1;  padding: 8px; text-align: center;  display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
+            .sig-role {  font-size: 7.5pt;  font-weight: bold;  color: #00aad2;  margin-bottom: 10px;  border-bottom: 1px solid #eee; padding-bottom: 5px;}
+            .sig-name { font-size: 8.5pt; font-weight: bold; margin-top: auto; padding-top: 10px;}
         }
     </style>
 </head>
@@ -233,10 +233,22 @@
         </div>
     </div>
     <div class="signature-grid">
-        <div class="sig-item"><div class="sig-role">OPERATOR (REQUESTER)</div><div class="sig-name out_sig_nama">-</div></div>
-        <div class="sig-item"><div class="sig-role">LEAD (CHECKED)</div><div class="sig-name">Alfian Ubaidillah</div></div>
-        <div class="sig-item"><div class="sig-role">SUPERVISOR (VERIFIED)</div><div class="sig-name">Wahyu Putra Rahmadi</div></div>
-        <div class="sig-item"><div class="sig-role">MANAGER (APPROVED)</div><div class="sig-name">Johan Wahyudi</div></div>
+        <div class="sig-item">
+            <div class="sig-role">OPERATOR (REQUESTER)</div>
+            <div class="sig-name out_sig_nama">-</div>
+        </div>
+        <div class="sig-item">
+            <div class="sig-role">LEAD (CHECKED)</div>
+            <div class="sig-name">Alfian Ubaidillah</div>
+        </div>
+        <div class="sig-item">
+            <div class="sig-role">SUPERVISOR (VERIFIED)</div>
+            <div class="sig-name">Wahyu Putra Rahmadi</div>
+        </div>
+        <div class="sig-item">
+            <div class="sig-role">MANAGER (APPROVED)</div>
+            <div class="sig-name">Johan Wahyudi</div>
+        </div>
     </div>
 </template>
 
