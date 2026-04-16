@@ -5,13 +5,12 @@
     <title>FORM Lembur - Hyundai Solusi Mobilitas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <style>
-
         :root {
             --hyundai-navy: #002c5f;
             --electric-blue: #00aad2;
-            --bg-dark: #1e293b; /* Slate 800 */
-            --panel-dark: #334155; /* Slate 700 */
-            --input-bg: #475569; /* Slate 600 */
+            --bg-dark: #1e293b;
+            --panel-dark: #334155;
+            --input-bg: #475569;
             --text-light: #f1f5f9;
             --border-tech: #64748b;
         }
@@ -65,18 +64,18 @@
             color: var(--electric-blue);
         }
 
-input, select, textarea { 
-    padding: 14px; 
-    background: var(--input-bg);
-    border: 1px solid var(--border-tech); 
-    border-radius: 12px; 
-    font-size: 15px; 
-    color: white;
-    transition: all 0.2s; 
-    width: 100%; 
-    box-sizing: border-box; 
-    appearance: none;
-}
+        input, select, textarea { 
+            padding: 14px; 
+            background: var(--input-bg);
+            border: 1px solid var(--border-tech); 
+            border-radius: 12px; 
+            font-size: 15px; 
+            color: white;
+            transition: all 0.2s; 
+            width: 100%; 
+            box-sizing: border-box; 
+            appearance: none;
+        }
 
         input:focus, textarea:focus {
             outline: none;
@@ -84,8 +83,6 @@ input, select, textarea {
             box-shadow: 0 0 0 3px rgba(0, 170, 210, 0.2);
             background: #404e5f;
         }
-
-        input[type="file"] { padding: 10px; font-size: 12px; }
 
         .btn-print {
             width: 100%; 
@@ -132,7 +129,7 @@ input, select, textarea {
             .content-cell { border: 1px solid #cbd5e1; border-left: none; }
             .photo-frame { width: 60mm; height: 70mm; border: 2px solid #002c5f; overflow: hidden; }
             .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
-            .signature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+            .signature-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
             .sig-item { border: 1px solid #cbd5e1; padding: 5px; text-align: center; }
             .sig-role { font-size: 7pt; font-weight: bold; color: #00aad2; margin-bottom: 40px; border-bottom: 1px solid #eee; }
             .sig-name { font-size: 8pt; font-weight: bold; }
@@ -150,14 +147,14 @@ input, select, textarea {
     <div class="input-grid">
         <div class="input-group span-2 full-mobile">
             <label>Nama Lengkap</label>
-         <select id="in_nama" onchange="updateData()">
-    <option value="">-- Pilih Nama --</option>
-    <option value="Alfian Ubaidillah">Alfian Ubaidillah</option>
-    <option value="Arfian Efendi">Arfian Efendi</option>
-    <option value="Cecep Iwan Setiawan">Cecep Iwan Setiawan</option>
-    <option value="Derry Aditya Royadi">Derry Aditya Royadi</option>
-    <option value="Misto">Misto</option>
-</select>
+            <select id="in_nama" onchange="updateData()">
+                <option value="">-- Pilih Nama --</option>
+                <option value="Alfian Ubaidillah">Alfian Ubaidillah</option>
+                <option value="Arfian Efendi">Arfian Efendi</option>
+                <option value="Cecep Iwan Setiawan">Cecep Iwan Setiawan</option>
+                <option value="Derry Aditya Royadi">Derry Aditya Royadi</option>
+                <option value="Misto">Misto</option>
+            </select>
         </div>
 
         <div class="input-group">
@@ -178,22 +175,13 @@ input, select, textarea {
             <input type="time" id="in_req_akhir" oninput="calculate()">
         </div>
 
-        <div class="input-group">
-            <label>Absensi IN</label>
-            <input type="time" id="in_mulai" oninput="calculate()">
-        </div>
-        <div class="input-group">
-            <label>Absensi OUT</label>
-            <input type="time" id="in_akhir" oninput="calculate()">
-        </div>
-
         <div class="input-group span-2 full-mobile">
             <label>Divisi / Jabatan</label>
             <select id="in_divisi" onchange="updateData()">
-    <option value="">-- Pilih Divisi --</option>
-    <option value="Operator">Operator</option>
-    <option value="Admin">Admin</option>
-</select>
+                <option value="">-- Pilih Divisi --</option>
+                <option value="Operator">Operator</option>
+                <option value="Admin">Admin</option>
+            </select>
         </div>
 
         <div class="input-group span-2 full-mobile">
@@ -212,7 +200,7 @@ input, select, textarea {
         </div>
     </div>
     
-<button class="btn-print" id="btnSubmit" onclick="prosesLembur()">Cetak & Simpan Data</button>
+    <button class="btn-print" id="btnSubmit" onclick="prosesLembur()">Cetak & Simpan Data</button>
 </div>
 
 <div id="print-area">
@@ -233,11 +221,10 @@ input, select, textarea {
             <table class="modern-table">
                 <tr><td class="label-cell">Nama</td><td class="content-cell"><strong class="out_nama">-</strong></td></tr>
                 <tr><td class="label-cell">Tanggal</td><td class="content-cell out_tgl">-</td></tr>
-                <tr><td class="label-cell">Request</td><td class="content-cell"><span class="out_req_mulai">-</span> s/d <span class="out_req_akhir">-</span></td></tr>
-                <tr><td class="label-cell">Waktu Absensi</td><td class="content-cell out_waktu">-</td></tr>
+                <tr><td class="label-cell">Request Time</td><td class="content-cell"><span class="out_req_mulai">-</span> s/d <span class="out_req_akhir">-</span></td></tr>
                 <tr><td class="label-cell">Total LEMBUR</td><td class="content-cell out_total" style="color:#00aad2; font-weight:800;">-</td></tr>
                 <tr><td class="label-cell">Div. / Dept</td><td class="content-cell"><span class="out_divisi">-</span> / <span class="out_dept">-</span></td></tr>
-                <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:35px; vertical-align:top; font-size:8pt;">-</td></tr>
+                <tr><td class="label-cell">Aktivitas</td><td class="content-cell out_reason" style="height:45px; vertical-align:top; font-size:8pt;">-</td></tr>
             </table>
         </div>
         <div class="photo-side" style="flex:1.2; text-align:center;">
@@ -254,15 +241,12 @@ input, select, textarea {
 </template>
 
 <script>
-// 1. KONFIGURASI GLOBAL
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaLf-fbX8KXkoJNY_g_XZAk9tQ9TNfsIuRzugLJ2PmAILBFG9o2wO7Pdtmfnx4axNDRA/exec";
 
-// 2. INITIALIZE TEMPLATE (Jalankan saat load)
 const template = document.getElementById('form-content').innerHTML;
 document.getElementById('form-top').innerHTML = template;
 document.getElementById('form-bottom').innerHTML = template;
 
-// 3. FUNGSI UPDATE TAMPILAN (Real-time)
 function updateData() {
     const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
     fields.forEach(f => {
@@ -285,12 +269,9 @@ function updateData() {
     });
 }
 
-// 4. FUNGSI HITUNG OTOMATIS (Total Jam)
 function calculate() {
     const reqS = document.getElementById('in_req_mulai').value;
     const reqE = document.getElementById('in_req_akhir').value;
-    const absIn = document.getElementById('in_mulai').value;
-    const absOut = document.getElementById('in_akhir').value;
 
     if(reqS && reqE) {
         let start = new Date("2026-01-01T" + reqS);
@@ -300,9 +281,6 @@ function calculate() {
         
         let diffMs = end - start;
         let diffHrs = diffMs / (1000 * 60 * 60);
-        
-        // --- LOGIKA PEMBULATAN KE BAWAH PER 0.5 JAM ---
-        // Math.floor(diffHrs * 2) / 2 akan membulatkan ke 0.5 terdekat di bawahnya
         let roundedHrs = Math.floor(diffHrs * 2) / 2;
         
         let hasil = roundedHrs >= 8 ? "FULL DAY" : roundedHrs.toFixed(1) + " HOURS";
@@ -310,13 +288,9 @@ function calculate() {
         document.getElementById('in_total').value = hasil;
         document.querySelectorAll('.out_total').forEach(el => el.innerText = hasil);
     }
-
-    if(absIn && absOut) {
-        document.querySelectorAll('.out_waktu').forEach(el => el.innerText = absIn + " - " + absOut);
-    }
     updateData();
 }
-// 5. HANDLING GAMBAR
+
 function handleImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -327,7 +301,6 @@ function handleImage(input) {
     }
 }
 
-// 6. FUNGSI UTAMA: SIMPAN & CETAK
 async function prosesLembur() {
     const btn = document.getElementById('btnSubmit');
     const nama = document.getElementById('in_nama').value;
@@ -340,25 +313,22 @@ async function prosesLembur() {
     btn.innerText = "Mengirim Data...";
     btn.disabled = true;
 
-    // Persiapan Data untuk Spreadsheet
     const formData = new FormData();
     formData.append("nama", nama); 
     formData.append("div_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); 
     formData.append("tanggal", document.getElementById('in_tgl').value); 
-    formData.append("waktu_absen", document.getElementById('in_mulai').value + " - " + document.getElementById('in_akhir').value); 
+    formData.append("waktu_absen", ""); // DIKOSONGKAN SESUAI PERMINTAAN
     formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); 
     formData.append("total", document.getElementById('in_total').value); 
     formData.append("aktivitas", document.getElementById('in_reason').value); 
 
     try {
-        // Kirim ke Google Sheets
         await fetch(SCRIPT_URL, {
             method: 'POST',
             body: formData,
             mode: 'no-cors' 
         });
 
-        // Jalankan Print setelah kirim (atau tanpa menunggu response karena no-cors)
         setTimeout(() => {
             window.print();
             btn.innerText = "Cetak & Simpan Data";
@@ -367,7 +337,7 @@ async function prosesLembur() {
 
     } catch (error) {
         console.error("Error:", error);
-        alert("Gagal menyimpan ke spreadsheet, tapi Anda tetap bisa mencetak.");
+        alert("Terjadi kesalahan, namun Anda tetap bisa mencetak.");
         window.print();
         btn.disabled = false;
     }
