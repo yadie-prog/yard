@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UIC System - Mobile Friendly Dark</title>
+    <title>UIC System - INPUT FORM6</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
@@ -27,12 +27,11 @@
             justify-content: center;
         }
 
-        /* --- TAMPILAN FORM (MOBILE FRIENDLY) --- */
         .form-card {
             background: var(--bg-card);
             width: 100%;
             max-width: 850px;
-            padding: 25px; /* Padding dinamis */
+            padding: 25px;
             border-radius: 20px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -63,7 +62,6 @@
             gap: 15px;
         }
 
-        /* Desktop Grid */
         @media (min-width: 768px) {
             .input-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -89,7 +87,7 @@
             border-radius: 10px;
             background: var(--input-bg);
             color: white;
-            font-size: 16px; /* Mencegah auto-zoom di iOS */
+            font-size: 16px; 
             width: 100%;
             box-sizing: border-box;
             transition: all 0.3s;
@@ -173,7 +171,7 @@
 
     <div class="form-card">
         <div class="form-header">
-            <h2>UIC UNIT HSM</h2>
+            <h2>UIC INFORMATION/h2>
             <p style="color: var(--text-dim); font-size: 0.8rem;">PT. Hyundai Solusi Mobilitas</p>
         </div>
         
@@ -205,7 +203,7 @@
                 <input type="number" id="quantity">
             </div>
             <div class="field-group">
-                <label>Nomor Polisi</label>
+                <label>PLAT NUMBER</label>
                 <input type="text" id="nopol" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')">
             </div>
             <div class="field-group">
