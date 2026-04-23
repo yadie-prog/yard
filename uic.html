@@ -59,7 +59,7 @@
 
         .input-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Default 1 kolom untuk mobile */
+            grid-template-columns: 1fr;
             gap: 15px;
         }
 
@@ -115,7 +115,7 @@
             text-transform: uppercase;
         }
 
-        /* --- TAMPILAN CETAK (TETAP PROFESIONAL A5 LANDSCAPE) --- */
+        
         #print-area { display: none; }
 
         @media print {
@@ -173,7 +173,7 @@
 
     <div class="form-card">
         <div class="form-header">
-            <h2>UIC MOBILE SYSTEM</h2>
+            <h2>UIC UNIT HSM</h2>
             <p style="color: var(--text-dim); font-size: 0.8rem;">PT. Hyundai Solusi Mobilitas</p>
         </div>
         
@@ -187,7 +187,10 @@
             </div>
             <div class="field-group">
                 <label>Unit Type</label>
-                <input type="text" id="unit_type" placeholder="Contoh: Ioniq 5">
+                <select id="unit_type">
+                    <option value="NEW CAR RENT">New Car Rent</option>
+                    <option value="USED CAR RENT">Used Car Rent</option>
+                </select>
             </div>
             <div class="field-group">
                 <label>Customer</label>
