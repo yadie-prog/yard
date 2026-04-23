@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIC System - Mobile Friendly Dark</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+            --input-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px; /* Padding lebih kecil untuk mobile */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- TAMPILAN FORM (MOBILE FRIENDLY) --- */
+        .form-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 850px;
+            padding: 25px; /* Padding dinamis */
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
+        }
+
+        @media (min-width: 768px) {
+            .form-card { padding: 40px; }
+            body { padding: 40px 20px; }
+        }
+
+        .form-header {
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent);
+            padding-left: 15px;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Default 1 kolom untuk mobile */
+            gap: 15px;
+        }
+
+        /* Desktop Grid */
+        @media (min-width: 768px) {
+            .input-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .full { grid-column: span 2; }
+        }
+
+        .field-group { display: flex; flex-direction: column; }
+
+        label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: white;
+            font-size: 16px; /* Mencegah auto-zoom di iOS */
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #1e293b;
+        }
+
+        .btn-print {
+            margin-top: 30px;
+            width: 100%;
+            background: var(--accent);
+            color: #0f172a;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* --- TAMPILAN CETAK (TETAP PROFESIONAL A5 LANDSCAPE) --- */
+        #print-area { display: none; }
+
+        @media print {
+            @page { size: A5 landscape; margin: 0; }
+            body { background: white; padding: 0; margin: 0; }
+            .form-card { display: none; }
+
+            #print-area {
+                display: block !important;
+                width: 210mm;
+                height: 148mm;
+                padding: 10mm;
+                box-sizing: border-box;
+                color: black;
+            }
+
+            .print-container {
+                border: 1.5pt solid #000;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .print-header {
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1.5pt solid #000;
+                background: #f8fafc !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .print-body {
+                padding: 15px 25px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                column-gap: 40px;
+                row-gap: 6px;
+            }
+
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 0.2pt solid #cbd5e1;
+                padding: 4px 0;
+            }
+
+            .info-label { font-weight: 700; font-size: 9pt; color: #475569; }
+            .info-value { font-size: 10pt; font-weight: 600; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h2>UIC MOBILE SYSTEM</h2>
+            <p style="color: var(--text-dim); font-size: 0.8rem;">PT. Hyundai Solusi Mobilitas</p>
+        </div>
+        
+        <form id="uicForm" class="input-grid">
+            <div class="field-group">
+                <label>Order Type</label>
+                <select id="order_type">
+                    <option value="Daily Rent">Daily Rent</option>
+                    <option value="Monthly Rent">Monthly Rent</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Unit Type</label>
+                <input type="text" id="unit_type" placeholder="Contoh: Ioniq 5">
+            </div>
+            <div class="field-group">
+                <label>Customer</label>
+                <input type="text" id="customer">
+            </div>
+            <div class="field-group">
+                <label>Unit Name</label>
+                <input type="text" id="unit">
+            </div>
+            <div class="field-group">
+                <label>Quantity</label>
+                <input type="number" id="quantity">
+            </div>
+            <div class="field-group">
+                <label>Nomor Polisi</label>
+                <input type="text" id="nopol" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')">
+            </div>
+            <div class="field-group">
+                <label>Rental Period</label>
+                <input type="text" id="rental_period">
+            </div>
+            <div class="field-group">
+                <label>Agreement Number</label>
+                <input type="text" id="agreement_number">
+            </div>
+            <div class="field-group">
+                <label>Delivery Plan</label>
+                <input type="date" id="delivery_plan">
+            </div>
+            <div class="field-group">
+                <label>Time</label>
+                <input type="time" id="time">
+            </div>
+            <div class="field-group full">
+                <label>Delivery Location</label>
+                <input type="text" id="delivery_location">
+            </div>
+            <div class="field-group">
+                <label>PIC Name</label>
+                <input type="text" id="pic">
+            </div>
+            <div class="field-group">
+                <label>Phone Number</label>
+                <input type="text" id="phone_number">
+            </div>
+
+            <button type="button" class="btn-print" onclick="generatePrint()">Print Document</button>
+        </form>
+    </div>
+
+    <div id="print-area">
+        <div class="print-container">
+            <div class="print-header">
+                <div>
+                    <h1 style="margin:0; font-size: 20pt; font-weight: 800;">UIC INFORMATION</h1>
+                    <p style="margin:0; font-size: 8pt; font-weight: 600;">PT. HYUNDAI SOLUSI MOBILITAS</p>
+                </div>
+                <div style="text-align: right; font-size: 7pt;">
+                    <strong>OFFICIAL DOCUMENT</strong><br>
+                    <span id="print-date"></span>
+                </div>
+            </div>
+
+            <div class="print-body" id="print-data">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        function generatePrint() {
+            const fields = [
+                { id: 'order_type', label: 'Order Type' },
+                { id: 'unit_type', label: 'Unit Type' },
+                { id: 'customer', label: 'Customer' },
+                { id: 'unit', label: 'Unit Name' },
+                { id: 'quantity', label: 'Qty' },
+                { id: 'nopol', label: 'Nopol' },
+                { id: 'rental_period', label: 'Period' },
+                { id: 'agreement_number', label: 'Agreement No' },
+                { id: 'delivery_plan', label: 'Delivery Date' },
+                { id: 'time', label: 'Time' },
+                { id: 'delivery_location', label: 'Location' },
+                { id: 'pic', label: 'PIC' },
+                { id: 'phone_number', label: 'Phone' }
+            ];
+
+            let html = '';
+            fields.forEach(f => {
+                const val = document.getElementById(f.id).value || '-';
+                html += `
+                    <div class="info-row">
+                        <div class="info-label">${f.label}</div>
+                        <div class="info-value">${val}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('print-data').innerHTML = html;
+            document.getElementById('print-date').innerText = new Date().toLocaleString('id-ID');
+            window.print();
+        }
+    </script>
+</body>
+</html>
