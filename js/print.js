@@ -12,7 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const checklistData = JSON.parse(sessionStorage.getItem("bastk_checklist_data") || "{}");
     const photos = JSON.parse(sessionStorage.getItem("bastk_uploaded_photos") || "[]");
 
-    if(!nopol) { alert("Data tidak lengkap!"); window.location.href="index.html"; return; }
+    if(!nopol) { 
+        alert("Data tidak lengkap! Kembali ke halaman utama."); 
+        window.location.href="index.html"; 
+        return; 
+    }
 
     // Set Nama File PDF Otomatis [NoPlat_Tanggal] saat User Klik Simpan/Cetak
     document.title = `${nopol}_${rawDate}`;
@@ -36,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (fixedOperators.includes(operator)) {
         ttdOperatorBox.innerHTML = `<img src="images/${operator.toLowerCase()}.png" alt="TTD Operator" onerror="this.parentElement.innerHTML='<div style=\'height:60px;\'></div>'">`;
     } else {
-        ttdOperatorBox.innerHTML = `<div style="height:60px;"></div>`; // Kosong jika nama manual
+        ttdOperatorBox.innerHTML = `<div style="height:60px;"></div>`;
     }
 
     // Render Tabel Checklist 2 Kolom Kompak
@@ -53,6 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const tbody = document.getElementById("p1_checklist_tbody");
     const keys = Object.keys(checklistItems);
+    tbody.innerHTML = ""; // Bersihkan dummy template jika ada
+    
     for (let i = 0; i < keys.length; i += 2) {
         const k1 = keys[i];
         const k2 = keys[i + 1];
@@ -73,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // === GENERATE PAGE 2+ (FOTO GRID MAX 8 PER PAGE) ===
     const fotoContainer = document.getElementById("lampiran_foto_container");
+    fotoContainer.innerHTML = ""; // Bersihkan kontainer
     const maxPhotosPerPage = 8;
     
     for (let i = 0; i < photos.length; i += maxPhotosPerPage) {
@@ -100,3 +107,15 @@ document.addEventListener("DOMContentLoaded", function () {
         fotoContainer.innerHTML += pageHtml;
     }
 });
+
+// === BAGIAN PERBAIKAN UTAMA: TRIGGER CETAK AMAN ===
+window.onload = function () {
+    // Berikan jeda waktu 500 milidetik agar memori browser selesai me-render Base64 Foto yang besar
+    setTimeout(function () {
+        try {
+            window.print();
+        } catch (e) {
+            alert("Gagal membuka jendela cetak secara otomatis. Silahkan tekan tombol 'Cetak / Simpan PDF' di bagian atas.");
+        }
+    }, 500);
+};
