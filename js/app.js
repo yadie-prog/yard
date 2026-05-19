@@ -1,9 +1,11 @@
 /**
  * File: js/app.js
  * Project: ITC Yard Monitoring System
+ * Penyempurnaan: Perbaikan inisialisasi form & canvas anti-stuck
  */
 
 document.addEventListener("DOMContentLoaded", function () {
+    
     // 1. SET WAKTU OTOMATIS
     const tanggalInput = document.getElementById("bastk_tanggal");
     if (tanggalInput) {
@@ -16,36 +18,47 @@ document.addEventListener("DOMContentLoaded", function () {
         tanggalInput.value = `${tahun}-${bulan}-${tanggal}T${jam}:${menit}`;
     }
 
-    // 2. SETUP CANVAS SIGNATURE (ANTI-RESET SCROLL)
+    // 2. SETUP CANVAS SIGNATURE (PENCEGAHAN EROR AWAL HALAMAN)
     const canvas = document.getElementById("sig-canvas");
     let ctx = null;
     let drawing = false;
     let isCanvasInitialized = false;
 
-    if (canvas) {
-        ctx = canvas.getContext("2d");
-
-        function initCanvas() {
-            if (isCanvasInitialized) return;
+    function initCanvas() {
+        if (!canvas) return;
+        try {
+            ctx = canvas.getContext("2d");
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            
+            // Berikan ukuran default jika bounding rect terbaca 0 saat loading
+            canvas.width = rect.width || 300;
+            canvas.height = rect.height || 150;
             
             ctx.lineWidth = 3; 
             ctx.lineCap = "round"; 
             ctx.strokeStyle = "#002c5f";
             isCanvasInitialized = true;
+        } catch (err) {
+            console.error("Gagal menginisialisasi canvas tanda tangan:", err);
         }
+    }
 
-        initCanvas();
+    // Eksekusi inisialisasi canvas setelah jendela browser benar-benar siap
+    if (canvas) {
+        if (document.readyState === "complete") {
+            initCanvas();
+        } else {
+            window.addEventListener("load", initCanvas);
+        }
 
         window.addEventListener("orientationchange", function() {
             isCanvasInitialized = false;
-            setTimeout(initCanvas, 200);
+            setTimeout(initCanvas, 300);
         });
 
         // Event Mouse
         canvas.addEventListener("mousedown", (e) => { 
+            if (!isCanvasInitialized) initCanvas();
             drawing = true; 
             ctx.beginPath(); 
             ctx.moveTo(e.offsetX, e.offsetY); 
@@ -56,8 +69,9 @@ document.addEventListener("DOMContentLoaded", function () {
         canvas.addEventListener("mouseup", () => drawing = false);
         canvas.addEventListener("mouseleave", () => drawing = false);
         
-        // Event Sentuhan HP (Mencegah Layar Ikut Bergeser)
+        // Event Sentuhan HP (Mencegah Layar Ikut Bergeser / Scroll)
         canvas.addEventListener("touchstart", (e) => { 
+            if (!isCanvasInitialized) initCanvas();
             drawing = true; 
             const touch = e.touches[0]; 
             const rectBox = canvas.getBoundingClientRect(); 
@@ -81,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (clearBtn) {
             clearBtn.addEventListener("click", (e) => { 
                 e.preventDefault(); 
-                ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); 
             });
         }
     }
@@ -158,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
         bastkForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            if (canvas) {
+            if (canvas && isCanvasInitialized) {
                 const blankCanvas = document.createElement("canvas");
                 blankCanvas.width = canvas.width;
                 blankCanvas.height = canvas.height;
@@ -191,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 sessionStorage.setItem("bastk_telp", document.getElementById("bastk_telp").value.trim());
                 sessionStorage.setItem("bastk_tipe", document.getElementById("bastk_tipe").value);
                 sessionStorage.setItem("bastk_raw_date", formattedDate);
-                sessionStorage.setItem("bastk_ttd_pic", canvas.toDataURL("image/png"));
+                sessionStorage.setItem("bastk_ttd_pic", canvas ? canvas.toDataURL("image/png") : "");
                 sessionStorage.setItem("bastk_checklist_data", JSON.stringify(checklistObj));
                 sessionStorage.setItem("bastk_uploaded_photos", JSON.stringify(uploadedPhotosBase64));
 
