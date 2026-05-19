@@ -1,5 +1,12 @@
+/**
+ * File: js/print.js
+ * Project: ITC Yard Monitoring System
+ * Description: Logic render cetak data BASTK ke template A4 & Auto-Download PDF 
+ *              menggunakan html2pdf.js untuk mengatasi freeze di HP.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
-    // Ambil seluruh data dari session storage browser
+    // 1. Ambil data dari Session Storage
     const jenis = sessionStorage.getItem("bastk_jenis");
     const operator = sessionStorage.getItem("bastk_operator");
     const nopol = sessionStorage.getItem("bastk_nopol");
@@ -12,16 +19,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const checklistData = JSON.parse(sessionStorage.getItem("bastk_checklist_data") || "{}");
     const photos = JSON.parse(sessionStorage.getItem("bastk_uploaded_photos") || "[]");
 
-    if(!nopol) { 
+    if (!nopol) { 
         alert("Data tidak lengkap! Kembali ke halaman utama."); 
-        window.location.href="index.html"; 
+        window.location.href = "index.html"; 
         return; 
     }
 
-    // Set Nama File PDF Otomatis [NoPlat_Tanggal] saat User Klik Simpan/Cetak
+    // Penamaan file PDF: NoPlat_Tanggal
+    const namaFilePDF = `${nopol}_${rawDate}.pdf`;
     document.title = `${nopol}_${rawDate}`;
 
-    // Isi Konten Page 1
+    // 2. Isi Konten Halaman 1 (Data Utama & Tabel)
     document.getElementById("p1_jenis").innerText = jenis.toUpperCase();
     document.getElementById("p1_tanggal").innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}) + " WIB";
     document.getElementById("p1_nopol").innerText = nopol;
@@ -32,7 +40,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("p1_nama_operator").innerText = `( ${operator} )`;
     document.getElementById("p1_title_ttd_pic").innerText = `MENGETAHUI : ${pic.toUpperCase()}`;
     document.getElementById("p1_nama_pic_bawah").innerText = `( ${pic} )`;
-    document.getElementById("p1_img_ttd_pic").src = ttdPic;
+    
+    if (ttdPic) {
+        document.getElementById("p1_img_ttd_pic").src = ttdPic;
+    }
 
     // Logika Auto TTD Operator Tetap
     const ttdOperatorBox = document.getElementById("p1_ttd_operator_box");
@@ -57,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const tbody = document.getElementById("p1_checklist_tbody");
     const keys = Object.keys(checklistItems);
-    tbody.innerHTML = ""; // Bersihkan dummy template jika ada
+    tbody.innerHTML = "";
     
     for (let i = 0; i < keys.length; i += 2) {
         const k1 = keys[i];
@@ -77,9 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.innerHTML += rowHtml;
     }
 
-    // === GENERATE PAGE 2+ (FOTO GRID MAX 8 PER PAGE) ===
+    // 3. Render Lampiran Foto ke Halaman Selanjutnya (Max 8 Foto per Halaman)
     const fotoContainer = document.getElementById("lampiran_foto_container");
-    fotoContainer.innerHTML = ""; // Bersihkan kontainer
+    fotoContainer.innerHTML = "";
     const maxPhotosPerPage = 8;
     
     for (let i = 0; i < photos.length; i += maxPhotosPerPage) {
@@ -87,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pageIndex = Math.floor(i / maxPhotosPerPage) + 1;
 
         let pageHtml = `
-            <div class="a4-page" style="margin: 20px auto 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+            <div class="a4-page" style="margin: 20px auto 0 auto; page-break-before: always;">
                 <div class="header-print" style="margin-bottom: 10mm;">
                     <div>
                         <h1 style="font-size: 14pt; font-weight: bold; color: #002c5f;">LAMPIRAN FOTO DOKUMENTASI UNIT</h1>
@@ -99,23 +110,35 @@ document.addEventListener("DOMContentLoaded", function () {
         pagePhotos.forEach(srcImg => {
             pageHtml += `
                 <div class="photo-item">
-                    <img src="${srcImg}" alt="Dokumentasi Unit BASTK">
+                    <img src="${srcImg}" alt="Dokumentasi Unit BASTK" style="width:100%; height:auto; display:block;">
                 </div>`;
         });
 
         pageHtml += `</div></div>`;
         fotoContainer.innerHTML += pageHtml;
     }
-});
 
-// === BAGIAN PERBAIKAN UTAMA: TRIGGER CETAK AMAN ===
-window.onload = function () {
-    // Berikan jeda waktu 500 milidetik agar memori browser selesai me-render Base64 Foto yang besar
+
     setTimeout(function () {
-        try {
+        // Target elemen yang akan diconvert ke PDF (biasanya container utama yang membungkus semua page)
+        const element = document.getElementById("printable_area") || document.body;
+        
+        const opsiPDF = {
+            margin:       0,
+            filename:     namaFilePDF,
+            image:        { type: 'jpeg', quality: 0.95 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Jalankan perintah unduh PDF
+        html2pdf().set(opsiPDF).from(element).save().then(() => {
+            console.log("PDF Berhasil diunduh otomatis.");
+        }).catch(err => {
+            console.error("Gagal cetak via html2pdf:", err);
+            // Fallback manual jika library terhambat
             window.print();
-        } catch (e) {
-            alert("Gagal membuka jendela cetak secara otomatis. Silahkan tekan tombol 'Cetak / Simpan PDF' di bagian atas.");
-        }
-    }, 500);
-};
+        });
+
+    }, 1000);
+});
