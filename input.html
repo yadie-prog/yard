@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form BASTK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="py-4 bg-light">
+
+    <!-- ================= DISPLAY FORM UTAMA (RESPONSIF MOBILE) ================= -->
+    <div id="mainFormContainer" class="container px-3">
+        <div class="card card-premium p-3 p-md-4 mb-4">
+            <form id="bastkForm">
+                <div class="row mb-3 g-2">
+                    <div class="col-6">
+                        <label class="text-muted small">Jenis BASTK</label>
+                        <input type="text" id="viewJenis" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small">Operator</label>
+                        <input type="text" id="viewOperator" class="form-control bg-light" readonly>
+                    </div>
+                </div>
+
+                <h5 class="text-hyundai border-bottom pb-2 mb-3 fw-bold">Data Kendaraan & Client</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Input</label>
+                        <input type="text" id="formTanggal" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nomor Polisi</label>
+                        <input type="text" id="formNoPol" class="form-control" placeholder="Contoh: B 1234 XYZ" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Type Kendaraan</label>
+                        <select id="formTipe" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nama Perusahaan</label>
+                        <input type="text" id="formPerusahaan" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nama PIC</label>
+                        <input type="text" id="formPic" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nomor Telepon</label>
+                        <input type="tel" id="formTelp" class="form-control" required>
+                    </div>
+                </div>
+
+                <h5 class="text-hyundai border-bottom pb-2 mb-3 fw-bold">Kelengkapan Unit (Ceklist)</h5>
+                <div class="row mb-4 g-2" id="ceklisContainer"></div>
+
+                <h5 class="text-hyundai border-bottom pb-2 mb-3 fw-bold">Dokumentasi & Validasi</h5>
+                <div class="row g-3 align-items-end mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Upload Foto Kendaraan dari Galeri</label>
+                        <input type="file" id="formFoto" class="form-control" multiple accept="image/*" required>
+                        <div class="form-text">Bisa pilih banyak foto sekaligus.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tanda Tangan Digital (Mengetahui: <span id="labelPic" class="fw-bold">-</span>)</label>
+                        <div>
+                            <canvas id="sigPad" class="signature-component w-100" height="150"></canvas>
+                            <button type="button" class="btn btn-sm btn-secondary mt-1" id="clearSig">Reset TTD</button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <button type="button" onclick="location.href='index.html'" class="btn btn-light px-3 py-2">Kembali</button>
+                    <button type="submit" class="btn bg-hyundai text-white px-4 py-2">Cetak BASTK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= TARGET LAYOUT PRINT A4 (HIDDEN DI LAYOUT MOBILE) ================= -->
+    <div id="printArea">
+        <!-- PAGE 1: FORM UTAMA -->
+        <div class="print-page">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                <img src="hyundai.png" alt="Hyundai" style="height: 35px; object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Hyundai_Motor_Company_logo.svg/2560px-Hyundai_Motor_Company_logo.svg.png'">
+                <div class="text-end">
+                    <h5 class="fw-bold text-hyundai m-0" id="printJenis"></h5>
+                    <small class="text-muted" id="printTanggal"></small>
+                </div>
+            </div>
+
+            <div class="row mb-3 small">
+                <div class="col-6">
+                    <table class="table table-sm table-borderless m-0">
+                        <tr><td width="35%">No. Polisi</td><td>: <strong id="pNoPol"></strong></td></tr>
+                        <tr><td>Perusahaan</td><td>: <span id="pPerusahaan"></span></td></tr>
+                        <tr><td>Nama PIC</td><td>: <span id="pPic"></span></td></tr>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <table class="table table-sm table-borderless m-0">
+                        <tr><td width="35%">Tipe Unit</td><td>: <span id="pTipe"></span></td></tr>
+                        <tr><td>No. Telp</td><td>: <span id="pTelp"></span></td></tr>
+                        <tr><td>Operator</td><td>: <span id="pOperator"></span></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h6 class="fw-bold text-hyundai border-bottom pb-1 small">Hasil Ceklist Kelengkapan</h6>
+            <div class="row g-1 mb-4" id="printCeklistResult" style="font-size: 11px;"></div>
+
+            <!-- Bagian Tanda Tangan Terikat di Bawah Page 1 -->
+            <div class="position-absolute" style="bottom: 25mm; left: 15mm; right: 15mm;">
+                <div class="row text-center small">
+                    <div class="col-4">
+                        <p class="mb-4">Petugas / Operator</p>
+                        <div style="height: 55px;" class="d-flex align-items-center justify-content-center" id="pTtdOperatorBox"></div>
+                        <p class="fw-bold mt-2 border-top pt-1 m-0" id="pOpNama"></p>
+                    </div>
+                    <div class="col-4">
+                        <p class="mb-4">Mengetahui : PIC</p>
+                        <div style="height: 55px;" class="d-flex align-items-center justify-content-center">
+                            <img id="pTtdPicImg" style="max-height: 55px;">
+                        </div>
+                        <p class="fw-bold mt-2 border-top pt-1 m-0" id="pPicNama"></p>
+                    </div>
+                    <div class="col-4">
+                        <p class="mb-4">Disetujui Oleh</p>
+                        <div style="height: 55px;"></div>
+                        <p class="fw-bold mt-2 border-top pt-1 m-0">ACC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2++: DYNAMIC PHOTO CONTAINER -->
+        <div id="printPhotoPages"></div>
+    </div>
+
+    <!-- Script Pendukung Lokal -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

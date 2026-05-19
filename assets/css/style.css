@@ -1,0 +1,92 @@
+/* Custom UI variables untuk Hyundai Premium Look */
+:root {
+    --hyundai-dark: #002c5f;
+    --hyundai-blue: #00aad2;
+    --silver-light: #f8fafc;
+    --text-dark: #1e293b;
+}
+
+body {
+    background-color: var(--silver-light);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text-dark);
+}
+
+.bg-hyundai { background-color: var(--hyundai-dark) !important; }
+.text-hyundai { color: var(--hyundai-dark); }
+
+/* Card Styling */
+.card-premium {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 44, 95, 0.05);
+}
+
+/* Kustomisasi Responsif untuk Handphone (Touch-friendly) */
+@media (max-width: 768px) {
+    .btn-group {
+        display: flex;
+        width: 100%;
+    }
+    .btn-group .btn {
+        flex: 1;
+        padding: 10px; /* Lebih mudah ditekan di HP */
+    }
+    .form-control, .form-select {
+        padding: 12px; /* Area sentuh lebih besar */
+        font-size: 16px; /* Mencegah auto-zoom di iOS Safari */
+    }
+}
+
+/* Signature Pad Styling */
+.signature-component {
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: crosshair;
+    touch-action: none; /* Mencegah layar scrolling saat tanda tangan di HP */
+}
+
+/* ==========================================
+   PRINT & VIEW LAYOUT CONTROL (A4 TARGET) 
+============================================ */
+#printArea {
+    display: none; /* Sembunyikan di layar form input utama */
+}
+
+@media print {
+    /* Sembunyikan semua elemen form input bawaan browser saat cetak */
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm;
+    }
+    
+    .print-page {
+        width: 210mm;
+        height: 292mm;
+        page-break-after: always;
+        padding: 15mm;
+        box-sizing: border-box;
+        position: relative;
+        background: #fff;
+    }
+
+    /* Grid Maksimal 8 Foto Per Halaman */
+    .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .photo-grid img {
+        width: 100%;
+        height: 110mm;
+        object-fit: cover;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+    }
+}
