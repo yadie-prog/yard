@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cetak BASTK - ITC Yard Monitoring System</title>
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Style Tambahan khusus Mode Preview & Cetak Dokumen A4 */
         body {
             background-color: #f0f2f5;
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
         }
-        
-        /* Bar Navigasi Atas (Tidak ikut tercetak) */
         .no-print-bar {
             background-color: #002c5f;
             color: white;
@@ -39,23 +35,17 @@
             text-decoration: none;
             font-size: 14px;
         }
-        .btn-back {
-            background-color: #666;
-        }
-
-        /* Layout Kertas A4 Digital di Browser */
+        .btn-back { background-color: #666; }
         .a4-page {
             background: white;
             width: 210mm;
             min-height: 297mm;
-            padding: 15mm 15mm 15mm 15mm;
+            padding: 15mm;
             margin: 20px auto;
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.15);
             position: relative;
         }
-
-        /* Desain Header Dokumen BASTK */
         .header-print {
             display: flex;
             justify-content: space-between;
@@ -63,24 +53,13 @@
             padding-bottom: 5px;
             margin-bottom: 5px;
         }
-        .logo-hyundai-print {
-            height: 20px;
-            margin-top: 5px;
-        }
-
-        /* Tabel Identitas BASTK */
         .table-info {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 10px;
             font-size: 10pt;
         }
-        .table-info td {
-            padding: 4px 6px;
-            vertical-align: top;
-        }
-
-        /* Tabel Checklist Kompak 2 Kolom */
+        .table-info td { padding: 4px 6px; vertical-align: top; }
         .table-checklist {
             width: 100%;
             border-collapse: collapse;
@@ -96,18 +75,13 @@
             color: #002c5f;
             font-weight: bold;
         }
-
-        /* Bagian Tanda Tangan (Signatures) */
         .section-ttd {
             display: flex;
             justify-content: space-between;
             margin-top: 15px;
             font-size: 10pt;
         }
-        .ttd-box {
-            width: 45%;
-            text-align: center;
-        }
+        .ttd-box { width: 45%; text-align: center; }
         .ttd-space {
             height: 60px;
             display: flex;
@@ -115,13 +89,7 @@
             justify-content: center;
             margin: 5px 0;
         }
-        .ttd-space img {
-            max-height: 60px;
-            max-width: 100%;
-            object-fit: contain;
-        }
-
-        /* Layout Grid Lampiran Foto Dokumentasi */
+        .ttd-space img { max-height: 60px; max-width: 100%; object-fit: contain; }
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -142,15 +110,9 @@
             object-fit: cover;
             display: block;
         }
-
-        /* CSS Rule saat proses cetak printer fisik / native PDF */
         @media print {
-            .no-print-bar {
-                display: none !important;
-            }
-            body {
-                background: white;
-            }
+            .no-print-bar { display: none !important; }
+            body { background: white; }
             .a4-page {
                 margin: 0 !important;
                 box-shadow: none !important;
@@ -163,27 +125,23 @@
 </head>
 <body>
 
-    <!-- BAR NAVIGASI ATAS: Sembunyi Otomatis Saat Jadi PDF -->
     <div class="no-print-bar">
         <div style="font-weight: bold; font-size: 16px;">Pratinjau Dokumen BASTK</div>
         <div>
             <a href="index.html" class="btn-action btn-back">⬅ Kembali</a>
-            <button type="button" id="btn-download-manual" class="btn-action">📥 Download PDF Manual</button>
+            <button type="button" id="btn-download-manual" class="btn-action">📥 Download PDF</button>
         </div>
     </div>
 
-    <!-- AREA UTAMA YANG AKAN DI-CONVERT MENJADI PDF (Presisi Ukuran Kertas) -->
     <div id="printable_area">
-        
-        <!-- === HALAMAN 1: FORM UTAMA & CHECKLIST === -->
+        <!-- HALAMAN 1: DATA UTAMA -->
         <div class="a4-page">
             <div class="header-print">
                 <div>
-                    <h1 style="margin:0; font-size: 16pt; font-weight: bold; color: #002c5f; letter-spacing: 0.5px;">BERITA ACARA SERAH TERIMA KENDARAAN</h1>
+                    <h1 style="margin:0; font-size: 16pt; font-weight: bold; color: #002c5f;">BERITA ACARA SERAH TERIMA KENDARAAN</h1>
                     <p style="margin:2px 0 0 0; font-size: 10pt; color: #555; font-weight: bold;">ITC YARD MONITORING SYSTEM — <span id="p1_jenis">INBOUND/OUTBOUND</span></p>
                 </div>
                 <div>
-                    <!-- Logo Hyundai menggunakan teks bergaya tebal jika image asset lokal tidak dipanggil -->
                     <div style="font-size: 14pt; font-weight: bold; color: #002c5f; font-style: italic;">HYUNDAI</div>
                 </div>
             </div>
@@ -192,7 +150,6 @@
                 Pada hari ini, <span id="p1_tanggal" style="font-weight: bold;">-</span>, telah dilakukan pemeriksaan fisik dan kelengkapan unit kendaraan secara bersama-sama dengan rincian informasi di bawah ini:
             </p>
 
-            <!-- Identitas Kendaraan & PIC -->
             <table class="table-info">
                 <tr>
                     <td style="width: 18%;"><strong>No. Plat Kendaraan</strong></td>
@@ -220,9 +177,8 @@
                 </tr>
             </table>
 
-            <h2 style="font-size: 11pt; color: #002c5f; margin: 5px 0 5px 0; text-transform: uppercase; border-left: 3px solid #002c5f; padding-left: 6px;">Checklist Kelengkapan & Fitur Kendaraan</h2>
+            <h2 style="font-size: 11pt; color: #002c5f; margin: 5px 0; text-transform: uppercase; border-left: 3px solid #002c5f; padding-left: 6px;">Checklist Kelengkapan & Fitur Kendaraan</h2>
             
-            <!-- Tabel Checklist Dinamis (Akan diisi via JavaScript) -->
             <table class="table-checklist">
                 <thead>
                     <tr>
@@ -232,18 +188,13 @@
                         <th style="width: 12%; text-align: center;">Status</th>
                     </tr>
                 </thead>
-                <tbody id="p1_checklist_tbody">
-                    <!-- Data dimasukkan oleh js/print.js secara otomatis -->
-                </tbody>
+                <tbody id="p1_checklist_tbody"></tbody>
             </table>
 
-            <!-- Lembar Tanda Tangan Dokumen Resmi -->
             <div class="section-ttd">
                 <div class="ttd-box">
                     <p style="margin: 0 0 5px 0; font-weight: bold; color: #555;">PETUGAS OPERATOR (YARD)</p>
-                    <div class="ttd-space" id="p1_ttd_operator_box">
-                        <!-- TTD Otomatis Misto/Alfian/Efendi/Derry dirender di sini -->
-                    </div>
+                    <div class="ttd-space" id="p1_ttd_operator_box"></div>
                     <p style="margin: 0; font-weight: bold;" id="p1_nama_operator">( ____________________ )</p>
                 </div>
                 
@@ -256,41 +207,24 @@
                 </div>
             </div>
 
-            <!-- Catatan Kaki (Footer Dokumen) -->
             <div style="position: absolute; bottom: 10mm; left: 15mm; right: 15mm; border-top: 1px solid #ccc; padding-top: 5px; display: flex; justify-content: space-between; font-size: 8pt; color: #777;">
                 <div>Dokumen digital sah diterbitkan oleh Hyundai Solusi Mobilitas (HSM) - Automated Monitoring System.</div>
                 <div>Halaman 1</div>
             </div>
         </div>
 
-        <!-- === HALAMAN 2 DAN SETERUSNYA (LAMPIRAN FOTO) === -->
-        <!-- Element pembungkus ini akan diisi grid foto secara otomatis oleh loop JavaScript -->
+        <!-- HALAMAN 2+ (LAMPIRAN FOTO DIGENERASI DI SINI) -->
         <div id="lampiran_foto_container"></div>
-
     </div>
 
-    <!-- INJEKSI LIBRARY EKSTERNAL: html2pdf.js Bundle untuk Konversi PDF Sisi Browser -->
+    <!-- Pustaka Eksternal untuk PDF Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <!-- SCRIPT LOGIKA UTAMA RENDER DOKUMEN -->
     <script src="js/print.js"></script>
-
-    <!-- Pemicu Tambahan Untuk Tombol Unduh PDF Manual -->
     <script>
         document.getElementById("btn-download-manual").addEventListener("click", function() {
-            const element = document.getElementById("printable_area");
-            const nopol = sessionStorage.getItem("bastk_nopol") || "BASTK";
-            const rawDate = sessionStorage.getItem("bastk_raw_date") || "DOKUMEN";
-            
-            const opsi = {
-                margin:       0,
-                filename:     `${nopol}_${rawDate}.pdf`,
-                image:        { type: 'jpeg', quality: 0.95 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            html2pdf().set(opsi).from(element).save();
+            if (typeof jalankanProsesUnduh === "function") {
+                jalankanProsesUnduh();
+            }
         });
     </script>
 </body>
