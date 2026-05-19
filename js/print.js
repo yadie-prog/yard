@@ -1,12 +1,29 @@
 /**
  * File: js/print.js
  * Project: ITC Yard Monitoring System
- * Description: Logic render cetak data BASTK ke template A4 & Auto-Download PDF 
- *              menggunakan html2pdf.js untuk mengatasi freeze di HP.
  */
 
+// Jadikan fungsi global agar bisa diakses langsung oleh tombol manual di HTML
+window.jalankanProsesUnduh = function() {
+    const element = document.getElementById("printable_area") || document.body;
+    const nopol = sessionStorage.getItem("bastk_nopol") || "BASTK";
+    const rawDate = sessionStorage.getItem("bastk_raw_date") || "DOKUMEN";
+    
+    const opsiPDF = {
+        margin:       0,
+        filename:     `${nopol}_${rawDate}.pdf`,
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opsiPDF).from(element).save().catch(err => {
+        console.error("Gagal convert html2pdf, mencoba native print:", err);
+        window.print();
+    });
+};
+
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Ambil data dari Session Storage
     const jenis = sessionStorage.getItem("bastk_jenis");
     const operator = sessionStorage.getItem("bastk_operator");
     const nopol = sessionStorage.getItem("bastk_nopol");
@@ -15,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const telp = sessionStorage.getItem("bastk_telp");
     const tipe = sessionStorage.getItem("bastk_tipe");
     const ttdPic = sessionStorage.getItem("bastk_ttd_pic");
-    const rawDate = sessionStorage.getItem("bastk_raw_date");
     const checklistData = JSON.parse(sessionStorage.getItem("bastk_checklist_data") || "{}");
     const photos = JSON.parse(sessionStorage.getItem("bastk_uploaded_photos") || "[]");
 
@@ -25,11 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return; 
     }
 
-    // Penamaan file PDF: NoPlat_Tanggal
-    const namaFilePDF = `${nopol}_${rawDate}.pdf`;
-    document.title = `${nopol}_${rawDate}`;
-
-    // 2. Isi Konten Halaman 1 (Data Utama & Tabel)
+    // ISI IDENTITAS UTAMA
     document.getElementById("p1_jenis").innerText = jenis.toUpperCase();
     document.getElementById("p1_tanggal").innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}) + " WIB";
     document.getElementById("p1_nopol").innerText = nopol;
@@ -41,11 +53,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("p1_title_ttd_pic").innerText = `MENGETAHUI : ${pic.toUpperCase()}`;
     document.getElementById("p1_nama_pic_bawah").innerText = `( ${pic} )`;
     
-    if (ttdPic) {
-        document.getElementById("p1_img_ttd_pic").src = ttdPic;
-    }
+    if (ttdPic) document.getElementById("p1_img_ttd_pic").src = ttdPic;
 
-    // Logika Auto TTD Operator Tetap
+    // LOGIKA AUTO TTD OPERATOR
     const ttdOperatorBox = document.getElementById("p1_ttd_operator_box");
     const fixedOperators = ["Misto", "Alfian", "Efendi", "Derry"];
     if (fixedOperators.includes(operator)) {
@@ -54,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ttdOperatorBox.innerHTML = `<div style="height:60px;"></div>`;
     }
 
-    // Render Tabel Checklist 2 Kolom Kompak
+    // RENDER TABEL CHECKLIST 2 KOLOM
     const checklistItems = {
         "stnk": "STNK", "lembar_pajak": "Lembar Pajak", "buku_manual": "Buku Manual", "buku_service": "Buku Service",
         "asbak": "Asbak", "kaca_spion_dalam": "Kaca Spion Dalam", "kaca_spion_luar": "Kaca Spion Luar", 
@@ -73,11 +83,9 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 0; i < keys.length; i += 2) {
         const k1 = keys[i];
         const k2 = keys[i + 1];
-        
         let rowHtml = `<tr>
             <td>${checklistItems[k1]}</td>
             <td style="text-align:center; font-weight:bold;">${checklistData[k1] || 'TIDAK'}</td>`;
-        
         if (k2) {
             rowHtml += `<td>${checklistItems[k2]}</td>
                        <td style="text-align:center; font-weight:bold;">${checklistData[k2] || 'TIDAK'}</td>`;
@@ -88,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.innerHTML += rowHtml;
     }
 
-    // 3. Render Lampiran Foto ke Halaman Selanjutnya (Max 8 Foto per Halaman)
+    // RENDER HALAMAN FOTO DOKUMENTASI (MAX 8 FOTO PER HALAMAN)
     const fotoContainer = document.getElementById("lampiran_foto_container");
     fotoContainer.innerHTML = "";
     const maxPhotosPerPage = 8;
@@ -110,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pagePhotos.forEach(srcImg => {
             pageHtml += `
                 <div class="photo-item">
-                    <img src="${srcImg}" alt="Dokumentasi Unit BASTK" style="width:100%; height:auto; display:block;">
+                    <img src="${srcImg}" alt="Dokumentasi Unit">
                 </div>`;
         });
 
@@ -118,27 +126,8 @@ document.addEventListener("DOMContentLoaded", function () {
         fotoContainer.innerHTML += pageHtml;
     }
 
-
+    // PICU UNDUH OTOMATIS SETELAH ELEMEN VISUAL SIAP (DELAY 1 DETIK)
     setTimeout(function () {
-        // Target elemen yang akan diconvert ke PDF (biasanya container utama yang membungkus semua page)
-        const element = document.getElementById("printable_area") || document.body;
-        
-        const opsiPDF = {
-            margin:       0,
-            filename:     namaFilePDF,
-            image:        { type: 'jpeg', quality: 0.95 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Jalankan perintah unduh PDF
-        html2pdf().set(opsiPDF).from(element).save().then(() => {
-            console.log("PDF Berhasil diunduh otomatis.");
-        }).catch(err => {
-            console.error("Gagal cetak via html2pdf:", err);
-            // Fallback manual jika library terhambat
-            window.print();
-        });
-
+        window.jalankanProsesUnduh();
     }, 1000);
 });
