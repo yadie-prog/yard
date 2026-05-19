@@ -1,172 +1,216 @@
+/**
+ * BASTK Pure HTML Application Engine & Printing System
+ */
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Ambil & Proteksi Data Gate Awal dari Session Storage
-    const jenis = sessionStorage.getItem('gate_jenis_bastk');
-    const operator = sessionStorage.getItem('gate_operator_nama');
+    let signaturePad;
+    let uploadedPhotos = [];
 
-    if (!jenis || !operator) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // Set Tampilan Atas Form
-    document.getElementById('viewJenis').value = jenis;
-    document.getElementById('viewOperator').value = operator;
-    
-    // Set Waktu Otomatis Hari Ini (WIB Lokasi)
-    const skrg = new Date();
-    const formattedDate = skrg.getFullYear() + '-' + String(skrg.getMonth()+1).padStart(2, '0') + '-' + String(skrg.getDate()).padStart(2, '0') + ' ' + String(skrg.getHours()).padStart(2, '0') + ':' + String(skrg.getMinutes()).padStart(2, '0');
-    document.getElementById('formTanggal').value = formattedDate;
-
-    // 2. Render Pilihan Mobil Hyundai
-    const cars = ["Hyundai Palisade", "Hyundai Palisade Hybrid", "Hyundai Santafe Diesel", "Hyundai Santafe Bensin", "Hyundai Kona EV", "Hyundai All New Kona", "Hyundai Ioniq EV", "Hyundai Ioniq 5 Signature", "Hyundai Ioniq 5 Prime", "Hyundai Ioniq 6", "Hyundai Ioniq 9", "Hyundai Stargazer X Captain Seat", "Hyundai Stargazer X Seven Seat", "Hyundai Stargazer Captain Seat", "Hyundai Stargazer Seven Seat", "Hyundai Creta Prime", "Hyundai Creta Style", "Hyundai Creta Trend", "Genesis G80", "Genesis GV70", "Genesis"];
-    const selectTipe = document.getElementById('formTipe');
-    cars.forEach(car => {
-        let opt = document.createElement('option');
-        opt.value = car;
-        opt.innerText = car;
-        selectTipe.appendChild(opt);
-    });
-
-    // 3. Render Item Ceklist Dinamis
-    const items = ["STNK", "Lembar Pajak", "Buku Manual", "Buku Service", "Asbak", "Kaca Spion Dalam", "Kaca Spion Luar", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "P3K", "Sun Visor", "Radio / Tape/ CD", "Head Rest", "Antena", "Segitiga Pengaman", "Talang Air", "Ban Cadangan", "Dongkrak", "Tool Set", "Apar", "Tirekit (EV CAR)", "Charging (EV CAR)", "V2L (EV CAR)"];
-    const ceklisContainer = document.getElementById('ceklisContainer');
-    
-    items.forEach((item, index) => {
-        const itemId = `item_${index}`;
-        const html = `
-            <div class="col-md-4 col-6">
-                <div class="card p-2 bg-white border d-flex flex-row justify-content-between align-items-center" style="border-radius:10px;">
-                    <span class="small fw-semibold text-wrap" style="max-width:60%; font-size:13px;">${item}</span>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <input type="radio" class="btn-check" name="${itemId}" id="ada_${index}" value="1" checked>
-                        <label class="btn btn-outline-success px-2" for="ada_${index}">Ada</label>
-                        <input type="radio" class="btn-check" name="${itemId}" id="tidak_${index}" value="0">
-                        <label class="btn btn-outline-danger px-2" for="tidak_${index}">Tidak</label>
-                    </div>
-                </div>
-            </div>`;
-        ceklisContainer.insertAdjacentHTML('beforeend', html);
-    });
-
-    // 4. Sinkronisasi Live Label Nama PIC
-    document.getElementById('formPic').addEventListener('input', function() {
-        document.getElementById('labelPic').innerText = this.value || '-';
-    });
-
-    // 5. Inisialisasi Signature Pad (Responsif Touchscreen HP)
-    const canvas = document.getElementById('sigPad');
-    const signaturePad = new SignaturePad(canvas);
-    
-    document.getElementById('clearSig').addEventListener('click', () => signaturePad.clear());
-
-    // Fix Canvas Scaling di Android/iOS
-    function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
-        signaturePad.clear();
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // 6. PROSES SUBMIT & GENERATE PREVIEW CETAK (LOCAL ENGINE)
-    document.getElementById('bastkForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        if (signaturePad.isEmpty()) {
-            alert("Harap isi Tanda Tangan PIC terlebih dahulu!");
-            return;
-        }
-
-        // Ambil Nilai Form Input
-        const nopol = document.getElementById('formNoPol').value;
-        const perusahaan = document.getElementById('formPerusahaan').value;
-        const pic = document.getElementById('formPic').value;
-        const tipe = document.getElementById('formTipe').value;
-        const telp = document.getElementById('formTelp').value;
-
-        // Pemetaan ke Dokumen Cetak Page 1
-        document.getElementById('printJenis').innerText = jenis.toUpperCase();
-        document.getElementById('printTanggal').innerText = `Tanggal: ${formattedDate}`;
-        document.getElementById('pNoPol').innerText = nopol.toUpperCase();
-        document.getElementById('pPerusahaan').innerText = perusahaan;
-        document.getElementById('pPic').innerText = pic;
-        document.getElementById('pTipe').innerText = tipe;
-        document.getElementById('pTelp').innerText = telp;
-        document.getElementById('pOperator').innerText = operator;
-        document.getElementById('pOpNama').innerText = operator;
-        document.getElementById('pPicNama').innerText = pic;
-
-        // Proses Pemetaan Ceklist Kelengkapan ke Cetak
-        const printCeklistResult = document.getElementById('printCeklistResult');
-        printCeklistResult.innerHTML = '';
-        items.forEach((item, index) => {
-            const isAda = document.getElementById(`ada_${index}`).checked;
-            const statusText = isAda ? '✔ ADA' : '✘ TIDAK';
-            const statusClass = isAda ? 'text-success' : 'text-danger fw-bold';
+    // --- SCREEN NAVIGATION LOGIC ---
+    const gateForm = document.getElementById('gateForm');
+    if (gateForm) {
+        gateForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const operatorSelect = document.getElementById('operatorSelect').value;
+            const operatorManual = document.getElementById('operatorManual').value;
             
-            const itemHtml = `
-                <div class="col-4 border-bottom py-1 d-flex justify-content-between">
-                    <span>${item}</span>
-                    <span class="${statusClass}" style="margin-right:15px;">${statusText}</span>
-                </div>`;
-            printCeklistResult.insertAdjacentHTML('beforeend', itemHtml);
+            // Simpan parameter global sementara di DOM elemen
+            document.getElementById('renderJenisBastk').innerText = document.getElementById('gateJenisBastk').value.toUpperCase();
+            document.getElementById('renderOperator').innerText = (operatorSelect === 'Manual') ? operatorManual : operatorSelect;
+            
+            // Pindah Screen
+            document.getElementById('screenGate').classList.add('d-none');
+            document.getElementById('screenInput').classList.remove('d-none');
+            
+            // Set Tanggal Otomatis saat masuk form
+            const now = new Date();
+            const timeString = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+            document.getElementById('inputTanggal').value = timeString;
+            document.getElementById('renderTanggal').innerText = timeString;
+            
+            // Inisialisasi Ulang TTD Canvas agar dimensinya terbaca pas saat screen terbuka
+            initSignaturePad();
         });
 
-        // Set TTD Operator Otomatis jika file PNG-nya tersedia di root/assets
-        const pTtdOperatorBox = document.getElementById('pTtdOperatorBox');
-        const listOpFiks = ['misto', 'alfian', 'efendi', 'derry'];
-        const currentOpLower = operator.toLowerCase();
+        // Toggle Manual Input Operator
+        document.getElementById('operatorSelect').addEventListener('change', function() {
+            const manualInput = document.getElementById('operatorManual');
+            if(this.value === 'Manual') {
+                manualInput.classList.remove('d-none');
+                manualInput.setAttribute('required', 'required');
+            } else {
+                manualInput.classList.add('d-none');
+                manualInput.removeAttribute('required');
+            }
+        });
+    }
 
-        if (listOpFiks.includes(currentOpLower)) {
-            pTtdOperatorBox.innerHTML = `<img src="${currentOpLower}.png" style="max-height: 55px;" onerror="this.style.display='none'; this.parentElement.innerText='( _______________ )'">`;
-        } else {
-            pTtdOperatorBox.innerHTML = `<span class="text-muted">( _________________ )</span>`;
-        }
+    // Sinkronisasi Nama PIC Real-time
+    const formPic = document.getElementById('formPic');
+    if (formPic) {
+        formPic.addEventListener('input', function() {
+            document.getElementById('labelPic').innerText = this.value || '-';
+        });
+    }
 
-        // Set TTD PIC Hasil Gambar Canvas
-        document.getElementById('pTtdPicImg').src = signaturePad.toDataURL();
-
-        // 7. MEMPROSES FILE GAMBAR LOKAL (FileReader API)
-        const files = document.getElementById('formFoto').files;
-        const photoPagesContainer = document.getElementById('printPhotoPages');
-        photoPagesContainer.innerHTML = ''; // Reset lampiran foto terdahulu
+    // --- SIGNATURE PAD MODULE ---
+    const canvas = document.getElementById('sigPad');
+    function initSignaturePad() {
+        if (!canvas) return;
+        signaturePad = new SignaturePad(canvas);
         
-        let loadedImages = [];
-        let filesProcessed = 0;
-
-        for (let i = 0; i < files.length; i++) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                loadedImages.push(event.target.result);
-                filesProcessed++;
-
-                if (filesProcessed === files.length) {
-                    // Jika semua foto selesai dimuat ke memori browser, susun maksimal 8 per-page
-                    const chunkSize = 8;
-                    for (let j = 0; j < loadedImages.length; j += chunkSize) {
-                        const chunk = loadedImages.slice(j, j + chunkSize);
-                        let pageHtml = `
-                            <div class="print-page">
-                                <h6 class="fw-bold text-hyundai border-bottom pb-2 mb-3">Lampiran Foto Dokumentasi Unit (Halaman ${Math.floor(j/chunkSize) + 1})</h6>
-                                <div class="photo-grid">`;
-                        
-                        chunk.forEach(src => {
-                            pageHtml += `<img src="${src}" alt="Unit Foto">`;
-                        });
-
-                        pageHtml += `</div></div>`;
-                        photoPagesContainer.insertAdjacentHTML('beforeend', pageHtml);
-                    }
-                    
-                    // Trigger Penamaan File PDF & Jendela Cetak Browser
-                    const cleanDate = formattedDate.split(' ')[0];
-                    document.title = nopol.replace(/\s+/g, '_').toUpperCase() + "_" + cleanDate;
-                    window.print();
-                }
-            };
-            reader.readAsDataURL(files[i]);
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const oldData = signaturePad.toData();
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.fromData(oldData);
         }
-    });
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+    }
+
+    const clearSigBtn = document.getElementById('clearSig');
+    if (clearSigBtn) {
+        clearSigBtn.addEventListener('click', () => signaturePad.clear());
+    }
+
+    // --- GALLERY MULTIPLE FILE CONVERTER ---
+    const inputFoto = document.getElementById('inputFoto');
+    if (inputFoto) {
+        inputFoto.addEventListener('change', function() {
+            uploadedPhotos = []; // Reset database array foto lama
+            const files = this.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedPhotos.push(event.target.result);
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        });
+    }
+
+    // --- SUBMIT COMPILATION & PRINT RENDER ---
+    const bastkForm = document.getElementById('bastkForm');
+    if (bastkForm) {
+        bastkForm.preventDefault;
+        bastkForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (signaturePad.isEmpty()) {
+                alert("Peringatan: Tanda Tangan PIC wajib diisi terlebih dahulu!");
+                return;
+            }
+            if (uploadedPhotos.length === 0) {
+                alert("Peringatan: Mohon lampirkan minimal 1 foto dokumentasi!");
+                return;
+            }
+
+            // 1. Ekstrak Data Teknis Input Form ke Lembar Cetak
+            const nopol = document.getElementById('inputNopol').value.toUpperCase();
+            document.title = nopol + "_" + document.getElementById('inputTanggal').value.split(' ')[0];
+            
+            document.getElementById('renderNopol').innerText = nopol;
+            document.getElementById('renderNopolHeader').innerText = nopol;
+            document.getElementById('renderPerusahaan').innerText = document.getElementById('inputPerusahaan').value;
+            document.getElementById('renderPic').innerText = document.getElementById('inputPic').value;
+            document.getElementById('renderPicFooter').innerText = document.getElementById('inputPic').value;
+            document.getElementById('renderTipe').innerText = document.getElementById('inputTipe').value;
+            document.getElementById('renderTelp').innerText = document.getElementById('inputTelp').value;
+            document.getElementById('renderOperatorFooter').innerText = document.getElementById('renderOperator').innerText;
+
+            // Integrasi File Gambar TTD Otomatis / Manual Operator
+            const opNameClean = document.getElementById('renderOperator').innerText.toLowerCase().trim();
+            const validOperators = ['misto', 'alfian', 'efendi', 'derry'];
+            const opTtdImg = document.getElementById('renderOperatorTtd');
+            
+            if (validOperators.includes(opNameClean)) {
+                opTtdImg.src = "assets/images/" + opNameClean + ".png";
+                opTtdImg.classList.remove('d-none');
+            } else {
+                opTtdImg.classList.add('d-none');
+            }
+
+            // Impor Gambar Hasil TTD PIC Base64
+            document.getElementById('renderPicTtd').src = signaturePad.toDataURL();
+
+            // 2. Ekstrak Status Matriks Ceklist
+            const matrixContainer = document.getElementById('printMatrixContainer');
+            matrixContainer.innerHTML = ''; // Clear template lama
+            
+            const checkedItems = document.querySelectorAll('.btn-check:checked');
+            checkedItems.forEach(item => {
+                const itemName = item.getAttribute('data-item');
+                const itemStatus = item.value;
+                const statusColor = (itemStatus === 'ADA') ? 'text-success' : 'text-danger fw-bold';
+                const statusIcon = (itemStatus === 'ADA') ? '✔ ADA' : '✘ TIDAK';
+
+                const div = document.createElement('div');
+                div.className = 'col-4 border-bottom py-1 d-flex justify-content-between';
+                div.innerHTML = `<span>${itemName}</span><span class="${statusColor}" style="margin-right:15px;">${statusIcon}</span>`;
+                matrixContainer.appendChild(div);
+            });
+
+            // 3. GENERATE GRID IMAGES 4x2 DYNAMIC PAGE SEPARATION
+            const photoPagesWrapper = document.getElementById('photoPagesWrapper');
+            photoPagesWrapper.innerHTML = ''; // Reset container cetak gambar lama
+
+            // Pecah array foto ke dalam kelompok berkapasitas maksimal 8 foto per halaman
+            const chunks = [];
+            for (let i = 0; i < uploadedPhotos.length; i += 8) {
+                chunks.push(uploadedPhotos.slice(i, i + 8));
+            }
+
+            let photoCounter = 1;
+            chunks.forEach((photoSet, pageIndex) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'print-page bg-white mx-auto border mb-4';
+                
+                // Set Susunan Elemen Struktur Header Lampiran Foto
+                let pageHeader = `
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                        <span class="fw-bold text-hyundai small" style="letter-spacing: 0.5px;">
+                            LAMPIRAN DOKUMENTASI FISIK UNIT – ${nopol}
+                        </span>
+                        <span class="text-muted small" style="font-size: 11px;">
+                            Halaman Foto: ${pageIndex + 1} dari ${chunks.length}
+                        </span>
+                    </div>
+                    <div class="photo-grid-4x2">
+                `;
+
+                // Loop Memasukkan Foto ke dalam Frame Grid 4x2
+                photoSet.forEach(base64Src => {
+                    pageHeader += `
+                        <div class="photo-card-frame">
+                            <div class="photo-badge">FOTO ${photoCounter++} / ${uploadedPhotos.length}</div>
+                            <img src="${base64Src}" alt="Dokumentasi Unit BASTK">
+                        </div>
+                    `;
+                });
+
+                pageHeader += `</div>`; // Close grid container tag
+                pageDiv.innerHTML = pageHeader;
+                photoPagesWrapper.appendChild(pageDiv);
+            });
+
+            // Switch Screen Utama ke Tampilan Cetak Preview
+            document.getElementById('screenInput').classList.add('d-none');
+            document.getElementById('screenPrintPreview').classList.remove('d-none');
+
+            // Trigger print window sistem operasi
+            window.print();
+        });
+    }
+
+    // Tombol Navigasi Kembali dari Layar Preview
+    const backToInputBtn = document.getElementById('backToInput');
+    if (backToInputBtn) {
+        backToInputBtn.addEventListener('click', function() {
+            document.getElementById('screenPrintPreview').classList.add('d-none');
+            document.getElementById('screenInput').classList.remove('d-none');
+        });
+    }
 });
