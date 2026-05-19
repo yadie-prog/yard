@@ -1,4 +1,6 @@
-/* Custom UI variables untuk Hyundai Premium Look */
+/* ==========================================================================
+   HYUNDAI PREMIUM DESIGN SYSTEM & MOBILE RESPONSIVE (HTML VERSION)
+   ========================================================================== */
 :root {
     --hyundai-dark: #002c5f;
     --hyundai-blue: #00aad2;
@@ -10,83 +12,103 @@ body {
     background-color: var(--silver-light);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: var(--text-dark);
+    margin: 0;
+    padding: 0;
 }
 
 .bg-hyundai { background-color: var(--hyundai-dark) !important; }
 .text-hyundai { color: var(--hyundai-dark); }
 
-/* Card Styling */
 .card-premium {
     border: none;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0, 44, 95, 0.05);
 }
 
-/* Kustomisasi Responsif untuk Handphone (Touch-friendly) */
-@media (max-width: 768px) {
-    .btn-group {
-        display: flex;
-        width: 100%;
-    }
-    .btn-group .btn {
-        flex: 1;
-        padding: 10px; /* Lebih mudah ditekan di HP */
-    }
-    .form-control, .form-select {
-        padding: 12px; /* Area sentuh lebih besar */
-        font-size: 16px; /* Mencegah auto-zoom di iOS Safari */
-    }
-}
-
-/* Signature Pad Styling */
 .signature-component {
     border: 2px dashed #cbd5e1;
     border-radius: 8px;
     background: #ffffff;
     cursor: crosshair;
-    touch-action: none; /* Mencegah layar scrolling saat tanda tangan di HP */
+    touch-action: none; /* Mengunci scroll layar HP saat tanda tangan */
 }
 
-/* ==========================================
-   PRINT & VIEW LAYOUT CONTROL (A4 TARGET) 
-============================================ */
-#printArea {
-    display: none; /* Sembunyikan di layar form input utama */
+/* Mengatur tampilan form di HP */
+@media (max-width: 768px) {
+    .btn-group { display: flex; width: 100%; }
+    .btn-group .btn { flex: 1; padding: 12px 10px; font-size: 14px; }
+    .form-control, .form-select { padding: 14px 12px; font-size: 16px; }
 }
 
+/* Tampilan Kontrol Aksi Layar Monitor */
+#actionPanel {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* ==========================================================================
+   PRINT LAYOUT CONTROL (STRICT A4 PORTRAIT SPECIFICATION)
+   ========================================================================== */
 @media print {
-    /* Sembunyikan semua elemen form input bawaan browser saat cetak */
-    body * { visibility: hidden; }
-    #printArea, #printArea * { visibility: visible; }
-    #printArea {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 210mm;
+    body { 
+        background: none !important; 
+        color: #000 !important; 
     }
+    .no-print { display: none !important; }
     
+    /* Ukuran Pas Kertas A4 Portrait */
     .print-page {
         width: 210mm;
-        height: 292mm;
+        height: 297mm;
         page-break-after: always;
-        padding: 15mm;
+        padding: 15mm 15mm 20mm 15mm;
         box-sizing: border-box;
         position: relative;
-        background: #fff;
+        background: #fff !important;
+        overflow: hidden;
     }
 
-    /* Grid Maksimal 8 Foto Per Halaman */
-    .photo-grid {
+    /* PREMIUM GRID CONFIGURATION (4 Baris x 2 Kolom) */
+    .photo-grid-4x2 {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    .photo-grid img {
+        grid-template-columns: repeat(2, 1fr); /* 2 Kolom Sejajar */
+        grid-template-rows: repeat(4, 56mm);   /* 4 Baris Presisi Kunci @56mm */
+        gap: 8mm; /* Jarak Antar Foto */
         width: 100%;
-        height: 110mm;
-        object-fit: cover;
+        margin-top: 5mm;
+    }
+
+    .photo-card-frame {
         border: 1px solid #cbd5e1;
         border-radius: 6px;
+        overflow: hidden;
+        background-color: #f8fafc;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .photo-card-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Foto otomatis dicrop proporsional tanpa gepeng */
+    }
+
+    .photo-badge {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        background: rgba(0, 44, 95, 0.85);
+        color: #fff;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+        z-index: 10;
     }
 }
