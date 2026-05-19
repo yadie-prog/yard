@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak BASTK</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background: #525659; padding: 20px 0;">
+
+    <div class="no-print" style="max-width: 210mm; margin: 0 auto 15px auto; background: white; padding: 15px; border-radius: 6px; display: flex; justify-content: space-between;">
+        <button onclick="window.location.href='input.html'" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Kembali ke Form Isian</button>
+        <button onclick="window.print()" style="padding: 10px 25px; background: #002c5f; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Cetak / Simpan PDF BASTK</button>
+    </div>
+
+    <!-- PAGE 1: DOKUMEN UTAMA -->
+    <div class="a4-page" style="margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+        <div class="header-print">
+            <div>
+                <h1 style="font-size: 18pt; font-weight: bold; color: #002c5f;" id="p1_jenis">BASTK</h1>
+                <p style="font-size: 10pt; color: #555;">Sistem Monitoring Logistik Kendaraan Hyundai</p>
+            </div>
+            <img src="images/hyundai.png" alt="Hyundai Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Hyundai_Motor_Company_logo.svg/2560px-Hyundai_Motor_Company_logo.svg.png'">
+        </div>
+
+        <table class="print-table">
+            <tr>
+                <th width="30%">Tanggal Cetak / Input</th><td id="p1_tanggal"></td>
+                <th width="25%">No. Polisi Unit</th><td><strong id="p1_nopol"></strong></td>
+            </tr>
+            <tr>
+                <th>Nama Perusahaan</th><td id="p1_pt"></td>
+                <th>Tipe Unit Kendaraan</th><td id="p1_tipe"></td>
+            </tr>
+            <tr>
+                <th>Nama PIC Berwenang</th><td id="p1_pic"></td>
+                <th>No. Handphone PIC</th><td id="p1_telp"></td>
+            </tr>
+        </table>
+
+        <h3 style="font-size: 12pt; margin: 15px 0 8px 0; border-bottom: 1px solid #000; padding-bottom:3px;">DAFTAR PENGECEKAN KELENGKAPAN KOMPONEN (CHECKLIST)</h3>
+        <table class="print-table" style="font-size: 9.5pt;">
+            <thead>
+                <tr>
+                    <th width="35%">Nama Komponen</th><th width="15%">Kondisi</th>
+                    <th width="35%">Nama Komponen</th><th width="15%">Kondisi</th>
+                </tr>
+            </thead>
+            <tbody id="p1_checklist_tbody"></tbody>
+        </table>
+
+        <div class="ttd-container">
+            <div class="ttd-box">
+                <div>OPERATOR SYSTEM</div>
+                <div id="p1_ttd_operator_box"></div>
+                <div style="border-top: 1px solid #000; padding-top: 5px;" id="p1_nama_operator"></div>
+            </div>
+            <div class="ttd-box">
+                <div id="p1_title_ttd_pic">MENGETAHUI : PIC</div>
+                <div><img id="p1_img_ttd_pic" src="" alt="TTD PIC"></div>
+                <div style="border-top: 1px solid #000; padding-top: 5px;" id="p1_nama_pic_bawah"></div>
+            </div>
+            <div class="ttd-box">
+                <div>MANAGEMENT (ACC)</div>
+                <div style="height:60px;"></div>
+                <div style="border-top: 1px solid #000; padding-top: 5px;">( ____________________ )</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2+: TEMPAT DOKUMENTASI FOTO (DI-RENDER DINAMIS OLEH JS) -->
+    <div id="lampiran_foto_container"></div>
+
+    <script src="js/print.js"></script>
+</body>
+</html>
