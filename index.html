@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem BASTK Hyundai Solusi Mobilitas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+    <script src="js/signature_pad.umd.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- STEP 1: LOGIN/AWAL -->
+        <section id="step-login" class="card active">
+            <div class="header">
+                <img src="images/hyundai.png" alt="Hyundai Logo" class="logo">
+                <h2>Form BASTK Digital</h2>
+            </div>
+            <div class="form-group">
+                <label>Pilih Jenis BASTK</label>
+                <select id="login-jenis">
+                    <option value="BASTK Unit Masuk">BASTK Unit Masuk</option>
+                    <option value="BASTK Unit Keluar">BASTK Unit Keluar</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nama Operator</label>
+                <input type="text" id="login-operator" placeholder="Masukkan nama Anda...">
+            </div>
+            <button class="btn-main" onclick="toStep(2)">Masuk Ke Form</button>
+        </section>
+
+        <!-- STEP 2: DATA UNIT -->
+        <section id="step-data-unit" class="card">
+            <h3>Data Kendaraan</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <input type="text" id="display-date" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <input type="text" id="display-jenis" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nomor Polisi</label>
+                <input type="text" id="input-nopol" placeholder="Contoh: B 1234 ABC">
+            </div>
+            <div class="form-group">
+                <label>Nama Perusahaan</label>
+                <input type="text" id="input-pt">
+            </div>
+            <div class="form-group">
+                <label>Nama PIC / Driver</label>
+                <input type="text" id="input-pic">
+            </div>
+            <div class="form-group">
+                <label>Nomor Telepon</label>
+                <input type="tel" id="input-telp">
+            </div>
+            <div class="form-group">
+                <label>Tipe Kendaraan</label>
+                <select id="input-tipe">
+                    <!-- Opsi Hyundai Lengkap -->
+                    <option>Hyundai Palisade</option>
+                    <option>Hyundai Palisade Hybrid</option>
+                    <option>Hyundai Santafe Diesel</option>
+                    <option>Hyundai Santafe Bensin</option>
+                    <option>Hyundai Kona EV</option>
+                    <option>Hyundai All New Kona</option>
+                    <option>Hyundai Ioniq 5 Signature</option>
+                    <option>Hyundai Ioniq 5 Prime</option>
+                    <option>Hyundai Ioniq 6</option>
+                    <option>Hyundai Ioniq 9</option>
+                    <option>Hyundai Stargazer X - Captain Seat</option>
+                    <option>Hyundai Stargazer Prime - Captain Seat</option>
+                    <option>Hyundai Stargazer X - Seven Seat</option>
+                    <option>Hyundai Stargazer Prime - Seven Seat</option>
+                    <option>Hyundai Creta Prime</option>
+                    <option>Hyundai Creta Style</option>
+                    <option>Hyundai Creta Tren</option>
+                    <option>Genesis G80</option>
+                    <option>Genesis G70</option>
+                </select>
+            </div>
+            <div class="nav-btns">
+                <button class="btn-back" onclick="toStep(1)">Kembali</button>
+                <button class="btn-main" onclick="toStep(3)">Berikutnya</button>
+            </div>
+        </section>
+
+        <!-- STEP 3: CEKLIST -->
+        <section id="step-ceklist" class="card">
+            <h3>Ceklist Kelengkapan</h3>
+            <div id="ceklist-container">
+            </div>
+            <div class="nav-btns">
+                <button class="btn-back" onclick="toStep(2)">Kembali</button>
+                <button class="btn-main" onclick="toStep(4)">Berikutnya</button>
+            </div>
+        </section>
+
+        <!-- STEP 4: KERUSAKAN & UPLOAD -->
+        <section id="step-upload" class="card">
+            <h3>Detail Kerusakan & Foto</h3>
+            <div class="form-group">
+                <label>Detail Kerusakan</label>
+                <textarea id="input-kerusakan" rows="4" placeholder="Jelaskan kondisi fisik unit..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Foto</label>
+                <input type="file" id="input-photos" accept="image/*" multiple onchange="previewImages()">
+                <div id="image-preview-grid"></div>
+            </div>
+            <div class="nav-btns">
+                <button class="btn-back" onclick="toStep(3)">Kembali</button>
+                <button class="btn-main" onclick="toStep(5)">Tanda Tangan</button>
+            </div>
+        </section>
+
+        <!-- STEP 5: TANDA TANGAN (FULL SCREEN MODAL) -->
+        <section id="step-signature" class="card">
+            <h3 id="sig-title">Tanda Tangan Operator</h3>
+            <p id="sig-name-display"></p>
+            <div class="signature-wrapper">
+                <canvas id="signature-pad"></canvas>
+            </div>
+            <div class="nav-btns">
+                <button class="btn-back" onclick="clearSignature()">Hapus</button>
+                <button class="btn-main" onclick="saveSignatureStep()">Simpan TTD</button>
+            </div>
+        </section>
+
+        <!-- STEP 6: FINISH -->
+        <section id="step-finish" class="card">
+            <h3>BASTK Selesai</h3>
+            <p>Data sudah siap diproses.</p>
+            <button class="btn-main" onclick="generatePDF()">Simpan & Download</button>
+            <button class="btn-back" onclick="toStep(4)" style="margin-top: 10px;">Edit Data Kembali</button>
+        </section>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
