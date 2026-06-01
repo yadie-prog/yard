@@ -10,10 +10,10 @@ let uploadedImages = [];
 // Pengelompokan Data Ceklist Berdasarkan Kompartemen Mobil
 const checklistCategories = {
     "Dokumen Utama": ["STNK", "Lembar Pajak", "Buku Manual", "Buku Service", "Kartu Parkir"],
-    "Komponen Interior": ["Kaca Spion Dalam", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "Sun Visor", "Radio/Tape/CD", "Head Rest"],
-    "Komponen Eksterior": ["Kaca Spion Luar", "Antena", "Talang Air"],
+    "Komponen Interior": ["Kunci Kontak", "Kunci Cadangan",  "Kaca Spion Dalam", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "Penahan Sinar Matahari", "Radio/Tape/CD", "Sandaran Kepala"],
+    "Komponen Eksterior": ["Kaca Spion Luar", "Antena", "Talang Air", "Penahan Lumpur", "DOP Roda", "Spoiler"],
     "Sistem Keselamatan & Peralatan": ["P3K", "Segitiga Pengaman", "Ban Cadangan", "Dongkrak", "Tool Set", "Apar"],
-    "Fitur Khusus Elektrik (EV CAR)": ["Tirekit (EV CAR)", "Charging (EV CAR)", "V2L (EV CAR)"]
+    "Fitur Khusus Elektrik (EV CAR)": ["Tirekit (EV CAR)", "Cairan Ban (EV CAR)", "Charging (EV CAR)", "V2L (EV CAR)"]
 };
 
 // ==========================================================================
