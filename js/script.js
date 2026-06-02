@@ -182,14 +182,14 @@ async function generatePDF() {
     const doc = new jsPDF('p', 'mm', 'a4');
     
     // Ambil Value Input
-    const nopol = (document.getElementById('input-nopol').value || "UNIT").toUpperCase();
+    const nopol = (document.getElementById('input-nopol').value || "UNIT").toUpperCase().replace(/\s+/g, '');
     const tglInput = document.getElementById('display-date').value;
     const jenisBASTK = document.getElementById('display-jenis').value.toUpperCase();
-    const perusahaan = document.getElementById('input-pt').value || "-";
-    const namaPic = document.getElementById('input-pic').value || "-";
+    const perusahaan = (document.getElementById('input-pt').value || "-").toUpperCase();
+    const namaPic = (document.getElementById('input-pic').value || "-").toUpperCase();
     const noTelp = document.getElementById('input-telp').value || "-";
     const tipeMobil = document.getElementById('input-tipe').value;
-    const operator = document.getElementById('login-operator').value;
+    const operator = (document.getElementById('login-operator').value || "OPERATOR").toUpperCase();
     const kerusakan = document.getElementById('input-kerusakan').value || "Kondisi unit baik dan mulus.";
 
     // --- HALAMAN 1: BERITA ACARA UTAMA ---
@@ -214,7 +214,7 @@ async function generatePDF() {
     doc.setTextColor(120, 120, 120);
     doc.text("HYUNDAI SOLUSI MOBILITAS | CORE SYSTEM DIGITAL", 195, 24, { align: 'right' });
 
-    // Panel Informasi Unit Kendaraan (Gray Container Card)
+// Panel Informasi Unit Kendaraan (Gray Container Card)
     doc.setFillColor(245, 247, 249);
     doc.rect(15, 32, 180, 34, 'F');
     
@@ -226,17 +226,17 @@ async function generatePDF() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(50, 50, 50);
-    // Grid Kiri
+// Grid Kiri
     doc.text(`Tanggal Input   : ${tglInput}`, 20, 45);
     doc.text(`No. Polisi          : ${nopol}`, 20, 51);
     doc.text(`Tipe Kendaraan : ${tipeMobil}`, 20, 57);
-    // Grid Kanan
+// Grid Kanan
     doc.text(`Nama Operator : ${operator}`, 115, 45);
     doc.text(`Nama PIC          : ${namaPic}`, 115, 51);
     doc.text(`No. Telepon      : ${noTelp}`, 115, 57);
     doc.text(`Perusahaan       : ${perusahaan}`, 115, 63);
 
-    // Tabel Ceklist Kelengkapan (Disusun Simetris 2 Kolom Sejajar)
+// Tabel Ceklist Kelengkapan (Disusun Simetris 2 Kolom Sejajar)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(0, 44, 95);
@@ -254,7 +254,7 @@ async function generatePDF() {
         let currentX = (index < 13) ? col1X : col2X;
         let currentY = startY + ((index % 13) * rowH);
         
-        // Striping Belang Abu Soft
+// Striping Belang Abu Soft
         if (Math.floor(index % 13) % 2 === 0) {
             doc.setFillColor(248, 249, 250);
             doc.rect(currentX, currentY - 4.2, 87, rowH, 'F');
@@ -265,7 +265,7 @@ async function generatePDF() {
         doc.setTextColor(60, 60, 60);
         doc.text(radio.dataset.item, currentX + 2, currentY);
         
-        // Atur warna indikator status kelengkapan
+// Atur warna indikator status kelengkapan
         if (radio.value === "Ada") {
             doc.setTextColor(46, 125, 50); // Hijau
             doc.setFont("helvetica", "bold");
@@ -276,7 +276,7 @@ async function generatePDF() {
         doc.text(`[ ${radio.value} ]`, currentX + 68, currentY);
     });
 
-    // Box Detail Kerusakan / Catatan Fisik BASTK
+// Box Detail Kerusakan / Catatan Fisik BASTK
 	let boxY = 160;
     let boxHeight = 35;
     
@@ -296,7 +296,7 @@ async function generatePDF() {
     let splitTxt = doc.splitTextToSize(kerusakan, 170);
     doc.text(splitTxt, 20, boxY + 13);
 
-    // Pembatas Area Otorisasi / Lembar Pengesahan TTD
+// Pembatas Area Otorisasi / Lembar Pengesahan TTD
     let ttdBlockY = 232;
     doc.setDrawColor(210, 215, 220);
     doc.line(15, ttdBlockY, 195, ttdBlockY);
@@ -309,7 +309,7 @@ async function generatePDF() {
     doc.text("MENGETAHUI (PIC / DRIVER)", 80, ttdBlockY + 6);
     doc.text("DISETUJUI (CUSTUMER)", 148, ttdBlockY + 6);
 
-    // Menyisipkan Grafis Tanda Tangan Digital Ke Dokumen
+// Menyisipkan Grafis Tanda Tangan Digital Ke Dokumen
     if (signatures.operator) doc.addImage(signatures.operator, 'PNG', 15, ttdBlockY + 9, 38, 18);
     if (signatures.pic)      doc.addImage(signatures.pic, 'PNG', 80, ttdBlockY + 9, 38, 18);
     if (signatures.acc)      doc.addImage(signatures.acc, 'PNG', 148, ttdBlockY + 9, 38, 18);
@@ -320,13 +320,13 @@ async function generatePDF() {
     doc.text(`( ${namaPic} )`, 80, ttdBlockY + 34);
     doc.text("( _____________________ )", 148, ttdBlockY + 34);
 
-    // Penanda Halaman Berita Acara Utama
+// Penanda Halaman Berita Acara Utama
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
     doc.setTextColor(160, 160, 160);
     doc.text("Dokumen digital BASTK ini sah dicetak oleh sistem. Halaman 1 dari 1", 15, 288);
 
-    // --- HALAMAN 2 & BERIKUTNYA: DOKUMENTASI FOTO ---
+// --- HALAMAN 2 & BERIKUTNYA: DOKUMENTASI FOTO ---
     if (uploadedImages.length > 0) {
         doc.addPage();
         
@@ -384,8 +384,31 @@ async function generatePDF() {
         });
     }
 
+// 1. Operator: Otomatis Huruf Besar Semua
+	document.getElementById('login-operator').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+});
+
+// 2. Nomor Polisi: Otomatis Huruf Besar & Tanpa Spasi
+	document.getElementById('input-nopol').addEventListener('input', function() {
+    // Ubah jadi huruf besar dan hapus semua jenis spasi saat itu juga
+    this.value = this.value.toUpperCase().replace(/\s+/g, '');
+});
+
+// 3. Nama Perusahaan: Otomatis Huruf Besar Semua
+	document.getElementById('input-pt').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+});
+
+// 4. Nama PIC: Otomatis Huruf Besar Semua
+	document.getElementById('input-pic').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+});
+
     // Trigger Perintah Simpan File Sesuai Format Penamaan Berkas
-    const sanitizedNopol = nopol.replace(/[^a-zA-Z0-9]/g, "_");
-    const sanitizedDate = tglInput.replace(/\//g, "-");
-    doc.save(`${sanitizedNopol}_${sanitizedDate}.pdf`);
+    const rawDate = document.getElementById('display-date').value;
+	const cleanDate = rawDate.replace(/\//g, '-');
+
+// Hasil output file langsung rapi. Contoh: B1234ABC_02-06-2026.pdf
+	doc.save(`${nopol}_${cleanDate}.pdf`);
 }
