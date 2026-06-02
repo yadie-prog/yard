@@ -10,18 +10,51 @@ let uploadedImages = [];
 // Pengelompokan Data Ceklist Berdasarkan Kompartemen Mobil
 const checklistCategories = {
     "Dokumen Utama": ["STNK", "Lembar Pajak", "Buku Manual", "Buku Service", "Kartu Parkir"],
-    "Komponen Interior": ["Kunci Kontak", "Kunci Cadangan",  "Kaca Spion Dalam", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "Penahan Sinar Matahari", "Radio/Tape/CD", "Sandaran Kepala"],
+    "Komponen Interior": ["Kunci Kontak", "Kunci Cadangan", "Kaca Spion Dalam", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "Penahan Sinar Matahari", "Radio/Tape/CD", "Sandaran Kepala"],
     "Komponen Eksterior": ["Kaca Spion Luar", "Antena", "Talang Air", "Penahan Lumpur", "DOP Roda", "Spoiler"],
     "Sistem Keselamatan & Peralatan": ["P3K", "Segitiga Pengaman", "Ban Cadangan", "Dongkrak", "Tool Set", "Apar"],
     "Fitur Khusus Elektrik (EV CAR)": ["Tirekit (EV CAR)", "Cairan Ban (EV CAR)", "Charging (EV CAR)", "V2L (EV CAR)"]
 };
 
 // ==========================================================================
-// INITIALIZATION / DOM READY
+// INITIALIZATION / DOM READY & AUTOMATION LISTENERS
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
     generateChecklistForm();
     window.addEventListener("resize", resizeCanvas);
+
+    // --- OTOMATISASI FORMAT INPUT KETIKAN (REAL-TIME) ---
+    // 1. Operator: Otomatis Huruf Besar Semua
+    const inputOp = document.getElementById('login-operator');
+    if (inputOp) {
+        inputOp.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+
+    // 2. Nomor Polisi: Otomatis Huruf Besar & Tanpa Spasi
+    const inputNopol = document.getElementById('input-nopol');
+    if (inputNopol) {
+        inputNopol.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/\s+/g, '');
+        });
+    }
+
+    // 3. Nama Perusahaan: Otomatis Huruf Besar Semua
+    const inputPt = document.getElementById('input-pt');
+    if (inputPt) {
+        inputPt.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+
+    // 4. Nama PIC: Otomatis Huruf Besar Semua
+    const inputPic = document.getElementById('input-pic');
+    if (inputPic) {
+        inputPic.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
 });
 
 // Render Komponen Struktur Ceklist Berbasis Radio Button Group
@@ -126,11 +159,11 @@ function initSignatureFlow(type) {
         signaturePad.clear();
     }
     
-    const titleConfig = { operator: "Tanda Tangan Operator", pic: "Tanda Tangan PIC/Customer", acc: "Tanda Tangan ACC" };
+    const titleConfig = { operator: "Tanda Tangan Operator", pic: "Tanda Tangan PIC / Driver", acc: "Tanda Tangan Customer" };
     const nameConfig = { 
-        operator: document.getElementById('login-operator').value, 
-        pic: document.getElementById('input-pic').value || "Customer", 
-        acc: "Management (Boleh Kosong)" 
+        operator: document.getElementById('login-operator').value.toUpperCase(), 
+        pic: (document.getElementById('input-pic').value || "PIC / DRIVER").toUpperCase(), 
+        acc: "CUSTOMER (DISETUJUI)" 
     };
     
     document.getElementById('sig-title').innerText = titleConfig[type];
@@ -181,7 +214,7 @@ async function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     
-    // Ambil Value Input
+    // Ambil & Transformasi Value Input Langsung Kapital/Clean Sesuai Aturan
     const nopol = (document.getElementById('input-nopol').value || "UNIT").toUpperCase().replace(/\s+/g, '');
     const tglInput = document.getElementById('display-date').value;
     const jenisBASTK = document.getElementById('display-jenis').value.toUpperCase();
@@ -214,7 +247,7 @@ async function generatePDF() {
     doc.setTextColor(120, 120, 120);
     doc.text("HYUNDAI SOLUSI MOBILITAS | CORE SYSTEM DIGITAL", 195, 24, { align: 'right' });
 
-// Panel Informasi Unit Kendaraan (Gray Container Card)
+    // Panel Informasi Unit Kendaraan (Gray Container Card)
     doc.setFillColor(245, 247, 249);
     doc.rect(15, 32, 180, 34, 'F');
     
@@ -226,17 +259,17 @@ async function generatePDF() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(50, 50, 50);
-// Grid Kiri
+    // Grid Kiri
     doc.text(`Tanggal Input   : ${tglInput}`, 20, 45);
     doc.text(`No. Polisi          : ${nopol}`, 20, 51);
     doc.text(`Tipe Kendaraan : ${tipeMobil}`, 20, 57);
-// Grid Kanan
+    // Grid Kanan
     doc.text(`Nama Operator : ${operator}`, 115, 45);
     doc.text(`Nama PIC          : ${namaPic}`, 115, 51);
     doc.text(`No. Telepon      : ${noTelp}`, 115, 57);
     doc.text(`Perusahaan       : ${perusahaan}`, 115, 63);
 
-// Tabel Ceklist Kelengkapan (Disusun Simetris 2 Kolom Sejajar)
+    // Tabel Ceklist Kelengkapan (Sistem Dinamis Berimbang 2 Kolom Sejajar)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(0, 44, 95);
@@ -246,16 +279,20 @@ async function generatePDF() {
     let startY = 82;
     let col1X = 15;
     let col2X = 108;
-    let rowH = 6.0;
+    let rowH = 5.5; // Kerapatan ideal agar muat banyak baris baru
     
     const allChecklists = document.querySelectorAll('.cek-radio:checked');
+    const totalItems = allChecklists.length;
+    const maxRowsPerCol = Math.ceil(totalItems / 2); // Bagi 2 seimbang kanan-kiri
     
     allChecklists.forEach((radio, index) => {
-        let currentX = (index < 13) ? col1X : col2X;
-        let currentY = startY + ((index % 13) * rowH);
+        let isColumn2 = index >= maxRowsPerCol;
+        let currentX = isColumn2 ? col2X : col1X;
+        let localRowIndex = isColumn2 ? (index - maxRowsPerCol) : index;
+        let currentY = startY + (localRowIndex * rowH);
         
-// Striping Belang Abu Soft
-        if (Math.floor(index % 13) % 2 === 0) {
+        // Striping Belang Abu Soft
+        if (localRowIndex % 2 === 0) {
             doc.setFillColor(248, 249, 250);
             doc.rect(currentX, currentY - 4.2, 87, rowH, 'F');
         }
@@ -265,7 +302,7 @@ async function generatePDF() {
         doc.setTextColor(60, 60, 60);
         doc.text(radio.dataset.item, currentX + 2, currentY);
         
-// Atur warna indikator status kelengkapan
+        // Atur warna indikator status kelengkapan
         if (radio.value === "Ada") {
             doc.setTextColor(46, 125, 50); // Hijau
             doc.setFont("helvetica", "bold");
@@ -276,9 +313,10 @@ async function generatePDF() {
         doc.text(`[ ${radio.value} ]`, currentX + 68, currentY);
     });
 
-// Box Detail Kerusakan / Catatan Fisik BASTK
-	let boxY = 160;
-    let boxHeight = 35;
+    // Box Detail Kerusakan / Catatan Fisik BASTK (Mengikuti Batas Akhir Ceklist)
+    let checklistEndY = startY + (maxRowsPerCol * rowH);
+    let boxY = checklistEndY + 6; 
+    let boxHeight = 35; // Tinggi kolom 35mm
     
     doc.setFillColor(255, 248, 248);
     doc.rect(15, boxY, 180, boxHeight, 'F');
@@ -288,15 +326,15 @@ async function generatePDF() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(180, 40, 40);
-    doc.text("CATATAN KHUSUS DETAIL KERUSAKAN / GORES BODY / CRASH:", 20, boxY + 6);
+    doc.text("CATATAN KHUSUS DETAIL KERUSAKAN / GORES BODY / CRASH:", 20, boxY + 5.5);
     
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(60, 60, 60);
     let splitTxt = doc.splitTextToSize(kerusakan, 170);
-    doc.text(splitTxt, 20, boxY + 13);
+    doc.text(splitTxt, 20, boxY + 12);
 
-// Pembatas Area Otorisasi / Lembar Pengesahan TTD
+    // Pembatas Area Otorisasi / Lembar Pengesahan TTD (Tepat di bawah Lembar Pertama)
     let ttdBlockY = 232;
     doc.setDrawColor(210, 215, 220);
     doc.line(15, ttdBlockY, 195, ttdBlockY);
@@ -307,9 +345,9 @@ async function generatePDF() {
     
     doc.text("OPERATOR", 15, ttdBlockY + 6);
     doc.text("MENGETAHUI (PIC / DRIVER)", 80, ttdBlockY + 6);
-    doc.text("DISETUJUI (CUSTUMER)", 148, ttdBlockY + 6);
+    doc.text("DISETUJUI (CUSTOMER)", 148, ttdBlockY + 6);
 
-// Menyisipkan Grafis Tanda Tangan Digital Ke Dokumen
+    // Menyisipkan Grafis Tanda Tangan Digital Ke Dokumen
     if (signatures.operator) doc.addImage(signatures.operator, 'PNG', 15, ttdBlockY + 9, 38, 18);
     if (signatures.pic)      doc.addImage(signatures.pic, 'PNG', 80, ttdBlockY + 9, 38, 18);
     if (signatures.acc)      doc.addImage(signatures.acc, 'PNG', 148, ttdBlockY + 9, 38, 18);
@@ -320,13 +358,13 @@ async function generatePDF() {
     doc.text(`( ${namaPic} )`, 80, ttdBlockY + 34);
     doc.text("( _____________________ )", 148, ttdBlockY + 34);
 
-// Penanda Halaman Berita Acara Utama
+    // Penanda Halaman Berita Acara Utama
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
     doc.setTextColor(160, 160, 160);
     doc.text("Dokumen digital BASTK ini sah dicetak oleh sistem. Halaman 1 dari 1", 15, 288);
 
-// --- HALAMAN 2 & BERIKUTNYA: DOKUMENTASI FOTO ---
+    // --- HALAMAN 2 & BERIKUTNYA: DOKUMENTASI FOTO ---
     if (uploadedImages.length > 0) {
         doc.addPage();
         
@@ -349,7 +387,6 @@ async function generatePDF() {
         let spacingY = 6;
 
         uploadedImages.forEach((imageSrc, index) => {
-            // Jika masuk ke kelipatan gambar ke-9, buat halaman lampiran baru
             if (index > 0 && index % 8 === 0) {
                 doc.addPage();
                 doc.setFont("helvetica", "bold");
@@ -357,7 +394,7 @@ async function generatePDF() {
                 doc.setTextColor(0, 44, 95);
                 doc.text("LAMPIRAN FOTO FOTO DOKUMENTASI FISIK KENDARAAN", 15, 16);
                 doc.line(15, 23, 195, 23);
-                startGridY = 28; // Reset koordinat Y ke atas
+                startGridY = 28;
             }
 
             let pageIndex = index % 8;
@@ -367,14 +404,11 @@ async function generatePDF() {
             let currentImgX = startGridX + (colIndex * (frameW + spacingX));
             let currentImgY = startGridY + (rowIndex * (frameH + spacingY));
 
-            // Gambar Border Tipis Bingkai Foto
             doc.setDrawColor(215, 220, 225);
             doc.rect(currentImgX, currentImgY, frameW, frameH, 'S');
             
-            // Masukkan Komponen File Gambar
             doc.addImage(imageSrc, 'JPEG', currentImgX + 1, currentImgY + 1, frameW - 2, frameH - 2);
             
-            // Tagging Badge Identitas Foto
             doc.setFillColor(0, 44, 95);
             doc.rect(currentImgX + 1, currentImgY + frameH - 5.5, 14, 4.5, 'F');
             doc.setFont("helvetica", "bold");
@@ -384,31 +418,8 @@ async function generatePDF() {
         });
     }
 
-// 1. Operator: Otomatis Huruf Besar Semua
-	document.getElementById('login-operator').addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-});
-
-// 2. Nomor Polisi: Otomatis Huruf Besar & Tanpa Spasi
-	document.getElementById('input-nopol').addEventListener('input', function() {
-    // Ubah jadi huruf besar dan hapus semua jenis spasi saat itu juga
-    this.value = this.value.toUpperCase().replace(/\s+/g, '');
-});
-
-// 3. Nama Perusahaan: Otomatis Huruf Besar Semua
-	document.getElementById('input-pt').addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-});
-
-// 4. Nama PIC: Otomatis Huruf Besar Semua
-	document.getElementById('input-pic').addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-});
-
-    // Trigger Perintah Simpan File Sesuai Format Penamaan Berkas
+    // Format Penamaan Berkas Download Berdasarkan No Polisi & Tanggal Input Form
     const rawDate = document.getElementById('display-date').value;
-	const cleanDate = rawDate.replace(/\//g, '-');
-
-// Hasil output file langsung rapi. Contoh: B1234ABC_02-06-2026.pdf
-	doc.save(`${nopol}_${cleanDate}.pdf`);
+    const cleanDate = rawDate.replace(/\//g, '-');
+    doc.save(`${nopol}_${cleanDate}.pdf`);
 }
