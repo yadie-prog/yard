@@ -245,7 +245,7 @@ async function generatePDF() {
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(120, 120, 120);
-    doc.text("HYUNDAI SOLUSI MOBILITAS | CORE SYSTEM DIGITAL", 195, 24, { align: 'right' });
+    doc.text("HYUNDAI SOLUSI MOBILITAS | DIGITAL", 195, 24, { align: 'right' });
 
     // Panel Informasi Unit Kendaraan (Gray Container Card)
     doc.setFillColor(245, 247, 249);
