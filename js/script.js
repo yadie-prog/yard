@@ -332,7 +332,7 @@ async function generatePDF() {
     doc.setFontSize(8.5);
     doc.setTextColor(60, 60, 60);
     let splitTxt = doc.splitTextToSize(kerusakan, 170);
-    doc.text(splitTxt, 20, boxY + 12);
+    doc.text(splitTxt, 20, boxY + 12, { align: 'left' });
 
     // Pembatas Area Otorisasi / Lembar Pengesahan TTD (Tepat di bawah Lembar Pertama)
     let ttdBlockY = 232;
