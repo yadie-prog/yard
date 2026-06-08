@@ -162,6 +162,44 @@ function getStepId(n) {
 }
 
 // ==========================================================================
+// DYNAMIC MODAL SYSTEM (POPUP CUSTOM)
+// ==========================================================================
+function showModal(message) {
+    const oldModal = document.getElementById('custom-alert-modal');
+    if (oldModal) oldModal.remove();
+
+    const modalHtml = `
+        <div id="custom-alert-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-icon">⚠️</span>
+                    <h3>Peringatan</h3>
+                </div>
+                <div class="modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()" class="btn-modal-close">Mengerti</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    setTimeout(() => {
+        document.getElementById('custom-alert-modal').classList.add('show');
+    }, 10);
+}
+
+function closeModal() {
+    const modal = document.getElementById('custom-alert-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+// ==========================================================================
 // PHOTO UPLOAD & PREVIEW LOGIC
 // ==========================================================================
 function previewImages() {
