@@ -84,6 +84,32 @@
             background: #404e5f;
         }
 
+        /* Styling tambahan untuk opsi Checklist */
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 5px 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            appearance: checkbox;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+        }
+        #lain_lain_wrapper {
+            margin-top: 8px;
+        }
+
         .btn-print {
             width: 100%; 
             padding: 18px; 
@@ -155,6 +181,7 @@
                 <option value="Dadang Supratman">Dadang Supratman</option>
                 <option value="Derry Aditya Royadi">Derry Aditya Royadi</option>
                 <option value="Misto">Misto</option>
+                <option value="Rudi Hadi Suwarno">Rudi Hadi Suwarno</option>
             </select>
         </div>
 
@@ -197,7 +224,23 @@
 
         <div class="input-group span-2 full-mobile">
             <label>Detail Aktivitas</label>
-            <textarea id="in_reason" rows="3" placeholder="Detail Tugas...." oninput="updateData()"></textarea>
+            <div class="checkbox-container">
+                <label class="checkbox-item">
+                    <input type="checkbox" class="chk-aktivitas" value="Preparation Unit Rental" onchange="toggleLainLain(); updateData();"> 
+                    Preparation Unit Rental
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" class="chk-aktivitas" value="Storing Unit" onchange="toggleLainLain(); updateData();"> 
+                    Storing Unit
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="chk_lain" onchange="toggleLainLain(); updateData();"> 
+                    Lain-lain
+                </label>
+            </div>
+            <div id="lain_lain_wrapper" style="display: none;">
+                <textarea id="in_reason_manual" rows="2" placeholder="Ketik aktivitas lainnya di sini...." oninput="updateData()"></textarea>
+            </div>
         </div>
     </div>
     
@@ -260,8 +303,39 @@ const template = document.getElementById('form-content').innerHTML;
 document.getElementById('form-top').innerHTML = template;
 document.getElementById('form-bottom').innerHTML = template;
 
+function toggleLainLain() {
+    const chkLain = document.getElementById('chk_lain');
+    const wrapper = document.getElementById('lain_lain_wrapper');
+    if (chkLain.checked) {
+        wrapper.style.display = 'block';
+    } else {
+        wrapper.style.display = 'none';
+        document.getElementById('in_reason_manual').value = '';
+    }
+}
+
+function getSelectedAktivitas() {
+    let listAktivitas = [];
+    
+    // Ambil nilai dari checkbox bawaan yang dicentang
+    document.querySelectorAll('.chk-aktivitas:checked').forEach(chk => {
+        listAktivitas.push(chk.value);
+    });
+    
+    // Ambil nilai dari input teks manual jika "Lain-lain" dicentang
+    const chkLain = document.getElementById('chk_lain');
+    const txtManual = document.getElementById('in_reason_manual').value.trim();
+    if (chkLain.checked && txtManual !== '') {
+        listAktivitas.push(txtManual);
+    } else if (chkLain.checked && txtManual === '') {
+        listAktivitas.push("Lain-lain");
+    }
+    
+    return listAktivitas.join(", ");
+}
+
 function updateData() {
-    const fields = ['nama', 'tgl', 'divisi', 'dept', 'reason', 'req_mulai', 'req_akhir'];
+    const fields = ['nama', 'tgl', 'divisi', 'dept', 'req_mulai', 'req_akhir'];
     fields.forEach(f => {
         let elInput = document.getElementById('in_' + f);
         if (!elInput) return;
@@ -280,6 +354,10 @@ function updateData() {
         document.querySelectorAll('.out_' + f).forEach(el => el.innerText = val || '-');
         if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
     });
+
+    // Perbaruan khusus untuk data Aktivitas Gabungan
+    const aktivitasGabungan = getSelectedAktivitas();
+    document.querySelectorAll('.out_reason').forEach(el => el.innerText = aktivitasGabungan || '-');
 }
 
 function calculate() {
@@ -333,7 +411,7 @@ async function prosesLembur() {
     formData.append("waktu_absen", ""); // DIKOSONGKAN SESUAI PERMINTAAN
     formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); 
     formData.append("total", document.getElementById('in_total').value); 
-    formData.append("aktivitas", document.getElementById('in_reason').value); 
+    formData.append("aktivitas", getSelectedAktivitas()); // MENGIRIM HASIL PILIHAN CEKLIS
 
     try {
         await fetch(SCRIPT_URL, {
