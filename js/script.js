@@ -88,7 +88,7 @@ function toStep(n) {
     if (n === 2 && currentStep === 1) {
         const opName = document.getElementById('login-operator').value.trim();
         if (!opName) {
-            alert("Harap masukkan Nama Operator terlebih dahulu!");
+            showModal("Harap masukkan Nama Operator terlebih dahulu!");
             return;
         }
         document.getElementById('display-jenis').value = document.getElementById('login-jenis').value;
@@ -110,7 +110,7 @@ function toStep(n) {
         });
 
         if (!allValid) {
-            alert("data wajib di isi.");
+            showModal("data wajib di isi.");
             return;
         }
     }
@@ -264,7 +264,7 @@ function clearSignature() {
 
 function saveSignatureStep() {
     if (signaturePad.isEmpty() && currentSigType === 'operator') {
-        alert("Tanda tangan wajib diisi sebelum melanjutkan!");
+        showModal("Tanda tangan wajib diisi sebelum melanjutkan!");
         return;
     }
     
