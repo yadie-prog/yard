@@ -314,7 +314,7 @@ async function generatePDF() {
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(120, 120, 120);
-    doc.text("HYUNDAI SOLUSI MOBILITAS | DIGITAL", 195, 24, { align: 'right' });
+    doc.text("HYUNDAI SOLUSI MOBILITAS | DIGITAL BASTK SYSTEM", 195, 24, { align: 'right' });
 
     doc.setFillColor(245, 247, 249);
     doc.rect(15, 32, 180, 34, 'F');
@@ -322,20 +322,22 @@ async function generatePDF() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
     doc.setTextColor(0, 44, 95);
-    doc.text("DATA IDENTITAS UNIT & INSPEKSI", 20, 38);
+    doc.text("DATA IDENTITAS UNIT, PIC, & OPERATOR", 20, 38);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(50, 50, 50);
-    // Grid Kiri
-    doc.text(`Tanggal Input     : ${tglInput}`, 20, 45);
-    doc.text(`No. Polisi            : ${nopol}`, 20, 51);
-    doc.text(`Tipe Kendaraan : ${tipeMobil}`, 20, 57);
-    // Grid Kanan
-    doc.text(`Nama Operator  : ${operator}`, 115, 45);
-    doc.text(`Nama PIC          : ${namaPic}`, 115, 51);
-    doc.text(`No. Telepon       : ${noTelp}`, 115, 57);
-    doc.text(`Perusahaan       : ${perusahaan}`, 115, 63);
+    
+    // --- KOLOM KIRI ---
+    doc.text("Tanggal Input", 20, 45);   doc.text(`: ${tglInput}`, 48, 45);
+    doc.text("No. Polisi", 20, 51);      doc.text(`: ${nopol}`, 48, 51);
+    doc.text("Tipe Kendaraan", 20, 57);  doc.text(`: ${tipeMobil}`, 48, 57);
+
+    // --- KOLOM KANAN ---
+    doc.text("Nama Operator", 110, 45);  doc.text(`: ${operator}`, 138, 45);
+    doc.text("Nama PIC", 110, 51);       doc.text(`: ${namaPic}`, 138, 51);
+    doc.text("No. Telepon", 110, 57);    doc.text(`: ${noTelp}`, 138, 57);
+    doc.text("Perusahaan", 110, 63);     doc.text(`: ${perusahaan}`, 138, 63);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
