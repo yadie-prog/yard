@@ -1,13 +1,9 @@
-// ==========================================================================
-// STATE MANAGEMENT & DATA STORAGE
-// ==========================================================================
 let currentStep = 1;
 let signaturePad;
 let signatures = { operator: null, pic: null, acc: null };
-let currentSigType = 'operator'; // operator -> pic -> acc
+let currentSigType = 'operator';
 let uploadedImages = [];
 
-// Pengelompokan Data Ceklist Berdasarkan Kompartemen Mobil
 const checklistCategories = {
     "Dokumen Utama": ["STNK", "Lembar Pajak", "Buku Manual", "Buku Service", "Kartu Parkir"],
     "Komponen Interior": ["Kunci Kontak", "Kunci Cadangan", "Kaca Spion Dalam", "Karpet depan", "karpet Tengah", "Karpet Belakang", "Lighter", "Loud Speaker", "Penahan Sinar Matahari", "Radio/Tape/CD", "Sandaran Kepala"],
@@ -23,8 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     generateChecklistForm();
     window.addEventListener("resize", resizeCanvas);
 
-    // --- OTOMATISASI FORMAT INPUT KETIKAN (REAL-TIME) ---
-    // 1. Operator: Otomatis Huruf Besar Semua
     const inputOp = document.getElementById('login-operator');
     if (inputOp) {
         inputOp.addEventListener('input', function() {
@@ -32,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 2. Nomor Polisi: Otomatis Huruf Besar & Tanpa Spasi
     const inputNopol = document.getElementById('input-nopol');
     if (inputNopol) {
         inputNopol.addEventListener('input', function() {
@@ -40,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. Nama Perusahaan: Otomatis Huruf Besar Semua
     const inputPt = document.getElementById('input-pt');
     if (inputPt) {
         inputPt.addEventListener('input', function() {
@@ -48,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. Nama PIC: Otomatis Huruf Besar Semua
     const inputPic = document.getElementById('input-pic');
     if (inputPic) {
         inputPic.addEventListener('input', function() {
@@ -57,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Render Komponen Struktur Ceklist Berbasis Radio Button Group
 function generateChecklistForm() {
     const container = document.getElementById('ceklist-container');
     if (!container) return;
@@ -94,29 +84,76 @@ function generateChecklistForm() {
 // NAVIGATION SYSTEM STEP-BY-STEP
 // ==========================================================================
 function toStep(n) {
-    // Validasi Login Step 1 Ke Step 2
+
     if (n === 2 && currentStep === 1) {
         const opName = document.getElementById('login-operator').value.trim();
         if (!opName) {
             alert("Harap masukkan Nama Operator terlebih dahulu!");
             return;
         }
-        // Kunci Informasi Utama & Set Tanggal Otomatis
         document.getElementById('display-jenis').value = document.getElementById('login-jenis').value;
         document.getElementById('display-date').value = new Date().toLocaleDateString('id-ID', {
             year: 'numeric', month: '2-digit', day: '2-digit'
         });
     }
 
-    // Sembunyikan Semua Card, Tampilkan Target Card
+    if (n === 4 && currentStep === 3) {
+        let allValid = true;
+        
+        Object.values(checklistCategories).forEach(items => {
+            items.forEach(item => {
+                const checkedRadio = document.querySelector(`input[name="chk-${item}"]:checked`);
+                if (!checkedRadio) {
+                    allValid = false;
+                }
+            });
+        });
+
+        if (!allValid) {
+            alert("data wajib di isi.");
+            return;
+        }
+    }
+
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     document.getElementById(getStepId(n)).classList.add('active');
     currentStep = n;
 
-    // Trigger Alur Tanda Tangan Berurutan di Step 5
     if (n === 5) {
         initSignatureFlow('operator');
     }
+}
+
+function generateChecklistForm() {
+    const container = document.getElementById('ceklist-container');
+    if (!container) return;
+    container.innerHTML = "";
+
+    Object.entries(checklistCategories).forEach(([categoryName, items]) => {
+        let categoryHtml = `
+            <div class="category-section">
+                <h4 class="category-title">${categoryName}</h4>
+                <div class="category-grid">
+        `;
+        
+        items.forEach(item => {
+            categoryHtml += `
+                <div class="ceklist-row">
+                    <span class="item-name">${item}</span>
+                    <div class="radio-toggle-group">
+                        <input type="radio" id="ada-${item}" name="chk-${item}" value="Ada" class="cek-radio" data-item="${item}">
+                        <label for="ada-${item}" class="lbl-toggle lbl-ada">Ada</label>
+                        
+                        <input type="radio" id="tidak-${item}" name="chk-${item}" value="Tidak Ada" class="cek-radio" data-item="${item}">
+                        <label for="tidak-${item}" class="lbl-toggle lbl-tidak">Tidak Ada</label>
+                    </div>
+                </div>
+            `;
+        });
+        
+        categoryHtml += `</div></div>`;
+        container.innerHTML += categoryHtml;
+    });
 }
 
 function getStepId(n) {
@@ -169,7 +206,7 @@ function initSignatureFlow(type) {
     document.getElementById('sig-title').innerText = titleConfig[type];
     document.getElementById('sig-name-display').innerText = nameConfig[type];
     
-    setTimeout(resizeCanvas, 50); // Beri jeda waktu render dom canvas agar ukuran presisi
+    setTimeout(resizeCanvas, 50); 
 }
 
 function resizeCanvas() {
@@ -180,7 +217,7 @@ function resizeCanvas() {
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
     canvas.getContext("2d").scale(ratio, ratio);
-    if(signaturePad) signaturePad.clear(); // Bersihkan dari distorsi stretching
+    if(signaturePad) signaturePad.clear();
 }
 
 function clearSignature() {
@@ -188,22 +225,19 @@ function clearSignature() {
 }
 
 function saveSignatureStep() {
-    // Validasi: Operator dan PIC wajib tanda tangan, ACC opsional
     if (signaturePad.isEmpty() && currentSigType === 'operator') {
         alert("Tanda tangan wajib diisi sebelum melanjutkan!");
         return;
     }
     
-    // Simpan data URL jika canvas terisi
     signatures[currentSigType] = signaturePad.isEmpty() ? null : signaturePad.toDataURL();
     
-    // Pindah otomatis ke penandatangan berikutnya
     if (currentSigType === 'operator') {
         initSignatureFlow('pic');
     } else if (currentSigType === 'pic') {
         initSignatureFlow('acc');
     } else {
-        toStep(6); // Selesai menuju halaman download
+        toStep(6);
     }
 }
 
@@ -213,8 +247,6 @@ function saveSignatureStep() {
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-    
-    // Ambil & Transformasi Value Input Langsung Kapital/Clean Sesuai Aturan
     const nopol = (document.getElementById('input-nopol').value || "UNIT").toUpperCase().replace(/\s+/g, '');
     const tglInput = document.getElementById('display-date').value;
     const jenisBASTK = document.getElementById('display-jenis').value.toUpperCase();
@@ -227,13 +259,12 @@ async function generatePDF() {
 
     // --- HALAMAN 1: BERITA ACARA UTAMA ---
     
-    // Header Dekoratif & Judul Utama
     const logoImg = document.querySelector('.logo');
     if (logoImg && logoImg.complete) {
         try { doc.addImage(logoImg, 'PNG', 15, 12, 45, 10); } catch(e){}
     }
     
-    doc.setDrawColor(0, 44, 95); // Hyundai Blue Line
+    doc.setDrawColor(0, 44, 95);
     doc.setLineWidth(0.5);
     doc.line(15, 26, 195, 26);
 
@@ -247,7 +278,6 @@ async function generatePDF() {
     doc.setTextColor(120, 120, 120);
     doc.text("HYUNDAI SOLUSI MOBILITAS | DIGITAL", 195, 24, { align: 'right' });
 
-    // Panel Informasi Unit Kendaraan (Gray Container Card)
     doc.setFillColor(245, 247, 249);
     doc.rect(15, 32, 180, 34, 'F');
     
@@ -261,15 +291,14 @@ async function generatePDF() {
     doc.setTextColor(50, 50, 50);
     // Grid Kiri
     doc.text(`Tanggal Input   : ${tglInput}`, 20, 45);
-    doc.text(`No. Polisi          : ${nopol}`, 20, 51);
+    doc.text(`No. Polisi         : ${nopol}`, 20, 51);
     doc.text(`Tipe Kendaraan : ${tipeMobil}`, 20, 57);
     // Grid Kanan
-    doc.text(`Nama Operator : ${operator}`, 115, 45);
-    doc.text(`Nama PIC          : ${namaPic}`, 115, 51);
+    doc.text(`Nama Operator  : ${operator}`, 115, 45);
+    doc.text(`Nama PIC         : ${namaPic}`, 115, 51);
     doc.text(`No. Telepon      : ${noTelp}`, 115, 57);
     doc.text(`Perusahaan       : ${perusahaan}`, 115, 63);
 
-    // Tabel Ceklist Kelengkapan (Sistem Dinamis Berimbang 2 Kolom Sejajar)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(0, 44, 95);
@@ -279,11 +308,11 @@ async function generatePDF() {
     let startY = 82;
     let col1X = 15;
     let col2X = 108;
-    let rowH = 5.5; // Kerapatan ideal agar muat banyak baris baru
+    let rowH = 5.5;
     
     const allChecklists = document.querySelectorAll('.cek-radio:checked');
     const totalItems = allChecklists.length;
-    const maxRowsPerCol = Math.ceil(totalItems / 2); // Bagi 2 seimbang kanan-kiri
+    const maxRowsPerCol = Math.ceil(totalItems / 2); 
     
     allChecklists.forEach((radio, index) => {
         let isColumn2 = index >= maxRowsPerCol;
@@ -291,7 +320,6 @@ async function generatePDF() {
         let localRowIndex = isColumn2 ? (index - maxRowsPerCol) : index;
         let currentY = startY + (localRowIndex * rowH);
         
-        // Striping Belang Abu Soft
         if (localRowIndex % 2 === 0) {
             doc.setFillColor(248, 249, 250);
             doc.rect(currentX, currentY - 4.2, 87, rowH, 'F');
@@ -302,7 +330,6 @@ async function generatePDF() {
         doc.setTextColor(60, 60, 60);
         doc.text(radio.dataset.item, currentX + 2, currentY);
         
-        // Atur warna indikator status kelengkapan
         if (radio.value === "Ada") {
             doc.setTextColor(46, 125, 50); // Hijau
             doc.setFont("helvetica", "bold");
@@ -313,10 +340,10 @@ async function generatePDF() {
         doc.text(`[ ${radio.value} ]`, currentX + 68, currentY);
     });
 
-    // Box Detail Kerusakan / Catatan Fisik BASTK (Mengikuti Batas Akhir Ceklist)
+    // Box Detail Kerusakan
     let checklistEndY = startY + (maxRowsPerCol * rowH);
     let boxY = checklistEndY + 6; 
-    let boxHeight = 35; // Tinggi kolom 35mm
+    let boxHeight = 35;
     
     doc.setFillColor(255, 248, 248);
     doc.rect(15, boxY, 180, boxHeight, 'F');
@@ -334,7 +361,6 @@ async function generatePDF() {
     let splitTxt = doc.splitTextToSize(kerusakan, 170);
     doc.text(splitTxt, 20, boxY + 12, { align: 'left' });
 
-    // Pembatas Area Otorisasi / Lembar Pengesahan TTD (Tepat di bawah Lembar Pertama)
     let ttdBlockY = 232;
     doc.setDrawColor(210, 215, 220);
     doc.line(15, ttdBlockY, 195, ttdBlockY);
@@ -347,7 +373,6 @@ async function generatePDF() {
     doc.text("MENGETAHUI (PIC / DRIVER)", 80, ttdBlockY + 6);
     doc.text("DISETUJUI (CUSTOMER)", 148, ttdBlockY + 6);
 
-    // Menyisipkan Grafis Tanda Tangan Digital Ke Dokumen
     if (signatures.operator) doc.addImage(signatures.operator, 'PNG', 15, ttdBlockY + 9, 38, 18);
     if (signatures.pic)      doc.addImage(signatures.pic, 'PNG', 80, ttdBlockY + 9, 38, 18);
     if (signatures.acc)      doc.addImage(signatures.acc, 'PNG', 148, ttdBlockY + 9, 38, 18);
@@ -358,7 +383,6 @@ async function generatePDF() {
     doc.text(`( ${namaPic} )`, 80, ttdBlockY + 34);
     doc.text("( _____________________ )", 148, ttdBlockY + 34);
 
-    // Penanda Halaman Berita Acara Utama
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
     doc.setTextColor(160, 160, 160);
@@ -378,7 +402,7 @@ async function generatePDF() {
         doc.text(`Nomor Polisi Unit: ${nopol}   |   Waktu: ${tglInput}`, 15, 21);
         doc.line(15, 23, 195, 23);
 
-        // Konfigurasi Grid Matriks Foto Maksimal 8 Item per Halaman (Layout 2x4)
+        // Grid Matriks 2x4
         let frameW = 86;
         let frameH = 56;
         let startGridX = 15;
@@ -418,7 +442,6 @@ async function generatePDF() {
         });
     }
 
-    // Format Penamaan Berkas Download Berdasarkan No Polisi & Tanggal Input Form
     const rawDate = document.getElementById('display-date').value;
     const cleanDate = rawDate.replace(/\//g, '-');
     doc.save(`${nopol}_${cleanDate}.pdf`);
