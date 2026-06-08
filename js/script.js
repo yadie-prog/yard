@@ -290,13 +290,13 @@ async function generatePDF() {
     doc.setFontSize(9);
     doc.setTextColor(50, 50, 50);
     // Grid Kiri
-    doc.text(`Tanggal Input   : ${tglInput}`, 20, 45);
-    doc.text(`No. Polisi         : ${nopol}`, 20, 51);
+    doc.text(`Tanggal Input     : ${tglInput}`, 20, 45);
+    doc.text(`No. Polisi            : ${nopol}`, 20, 51);
     doc.text(`Tipe Kendaraan : ${tipeMobil}`, 20, 57);
     // Grid Kanan
     doc.text(`Nama Operator  : ${operator}`, 115, 45);
-    doc.text(`Nama PIC         : ${namaPic}`, 115, 51);
-    doc.text(`No. Telepon      : ${noTelp}`, 115, 57);
+    doc.text(`Nama PIC          : ${namaPic}`, 115, 51);
+    doc.text(`No. Telepon       : ${noTelp}`, 115, 57);
     doc.text(`Perusahaan       : ${perusahaan}`, 115, 63);
 
     doc.setFont("helvetica", "bold");
@@ -384,9 +384,9 @@ async function generatePDF() {
     doc.text("( _____________________ )", 148, ttdBlockY + 34);
 
     doc.setFont("helvetica", "italic");
-    doc.setFontSize(7.5);
+    doc.setFontSize(6.5);
     doc.setTextColor(160, 160, 160);
-    doc.text("Dokumen digital BASTK ini sah dicetak oleh sistem. Halaman 1 dari 1", 15, 288);
+    doc.text("Dokumen digital BASTK ini sah dicetak oleh sistem dan telah di cek operator. Halaman 1 dari 2", 15, 288);
 
     // --- HALAMAN 2 & BERIKUTNYA: DOKUMENTASI FOTO ---
     if (uploadedImages.length > 0) {
