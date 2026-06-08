@@ -189,7 +189,7 @@ function clearSignature() {
 
 function saveSignatureStep() {
     // Validasi: Operator dan PIC wajib tanda tangan, ACC opsional
-    if (signaturePad.isEmpty() && currentSigType !== 'acc') {
+    if (signaturePad.isEmpty() && currentSigType === 'operator') {
         alert("Tanda tangan wajib diisi sebelum melanjutkan!");
         return;
     }
