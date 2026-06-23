@@ -386,3 +386,25 @@ canvas {
 .text-center {
     text-align: center;
 }
+
+
+/* ==========================================================================
+   PRINT STYLESHEET OVERRIDEs
+   ========================================================================== */
+@media print {
+    /* Memastikan grid pratinjau foto tetap rapi saat diprint */
+    #image-preview-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    /* Mengunci proporsi foto agar tidak ditarik/gepeng */
+    .preview-img {
+        width: 100% !important;
+        height: auto !important; /* Membiarkan tinggi menyesuaikan proporsi asli */
+        aspect-ratio: 4/3 !important; /* Menjaga rasio 4:3 tetap konsisten */
+        object-fit: cover !important; /* Memotong gambar secara proporsional jika beda dimensi */
+        display: block;
+    }
+}
