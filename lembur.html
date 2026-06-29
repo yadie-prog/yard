@@ -156,9 +156,11 @@
             .photo-frame { width: 60mm; height: 70mm; border: 2px solid #002c5f; overflow: hidden; }
             .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
             .signature-grid {display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px;}
-            .sig-item { border: 1px solid #cbd5e1;  padding: 8px; text-align: center;  display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
+            .sig-item { border: 1px solid #cbd5e1;  padding: 8px; text-align: center;  display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; position: relative;}
             .sig-role {  font-size: 7.5pt;  font-weight: bold;  color: #00aad2;  margin-bottom: 10px;  border-bottom: 1px solid #eee; padding-bottom: 5px;}
             .sig-name { font-size: 8.5pt; font-weight: bold; margin-top: auto; padding-top: 10px;}
+            .sig-img-container { height: 45px; display: flex; justify-content: center; align-items: center; margin: 2px 0; }
+            .sig-img-container img { max-height: 100%; max-width: 90px; object-fit: contain; }
         }
     </style>
 </head>
@@ -166,8 +168,8 @@
 
 <div class="input-panel">
     <div class="form-header">
-        <h2>E-Overtime</h2>
-        <p>PT. Hyundai Solusi Mobilitas - Glovis Indonesia International</p>
+        <h2>E-Form Overtime</h2>
+        <p>PT. Hyundai Solusi Mobilitas | PT. Glovis Indonesia International</p>
     </div>
 
     <div class="input-grid">
@@ -176,9 +178,7 @@
             <select id="in_nama" onchange="updateData()">
                 <option value="">-- Pilih Nama --</option>
                 <option value="Alfian Ubaidilah">Alfian Ubaidilah</option>
-                <option value="Arfian Efendi">Arfian Efendi</option>                
-                <option value="Cecep Iwan Setiawan">Cecep Iwan Setiawan</option>
-                <option value="Dadang Supratman">Dadang Supratman</option>
+                <option value="Arfian Efendi">Arfian Efendi</option>
                 <option value="Derry Aditya Royadi">Derry Aditya Royadi</option>
                 <option value="Misto">Misto</option>
                 <option value="Rudi Hadi Suwarno">Rudi Hadi Suwarno</option>
@@ -257,7 +257,7 @@
         <div class="logo-brand"><img src="Hyundai_logo.png" alt="Hyundai"></div>
         <div class="title-box">
             <h1>OVERTIME AUTHORIZATION</h1>
-            <p>PT. Hyundai Solusi Mobilitas | GII</p>
+            <p>PT. Hyundai Solusi Mobilitas | PT. Glovis Indonesia International</p>
         </div>
     </div>
     <div class="grid-container">
@@ -279,18 +279,22 @@
     <div class="signature-grid">
         <div class="sig-item">
             <div class="sig-role">OPERATOR (REQUESTER)</div>
+            <div class="sig-img-container"><img class="out_ttd" src="" style="display: none;"></div>
             <div class="sig-name out_sig_nama">-</div>
         </div>
         <div class="sig-item">
             <div class="sig-role">LEAD (CHECKED)</div>
+            <div class="sig-img-container"></div>
             <div class="sig-name">Alfian Ubaidillah</div>
         </div>
         <div class="sig-item">
             <div class="sig-role">SUPERVISOR (VERIFIED)</div>
+            <div class="sig-img-container"></div>
             <div class="sig-name">Wahyu Putra Rahmadi</div>
         </div>
         <div class="sig-item">
             <div class="sig-role">MANAGER (APPROVED)</div>
+            <div class="sig-img-container"></div>
             <div class="sig-name">Johan Wahyudi</div>
         </div>
     </div>
@@ -317,12 +321,10 @@ function toggleLainLain() {
 function getSelectedAktivitas() {
     let listAktivitas = [];
     
-    // Ambil nilai dari checkbox bawaan yang dicentang
     document.querySelectorAll('.chk-aktivitas:checked').forEach(chk => {
         listAktivitas.push(chk.value);
     });
     
-    // Ambil nilai dari input teks manual jika "Lain-lain" dicentang
     const chkLain = document.getElementById('chk_lain');
     const txtManual = document.getElementById('in_reason_manual').value.trim();
     if (chkLain.checked && txtManual !== '') {
@@ -336,6 +338,8 @@ function getSelectedAktivitas() {
 
 function updateData() {
     const fields = ['nama', 'tgl', 'divisi', 'dept', 'req_mulai', 'req_akhir'];
+    let currentNama = document.getElementById('in_nama').value;
+
     fields.forEach(f => {
         let elInput = document.getElementById('in_' + f);
         if (!elInput) return;
@@ -355,7 +359,16 @@ function updateData() {
         if(f === 'nama') document.querySelectorAll('.out_sig_nama').forEach(el => el.innerText = val || '-');
     });
 
-    // Perbaruan khusus untuk data Aktivitas Gabungan
+    document.querySelectorAll('.out_ttd').forEach(img => {
+        if (currentNama === "Derry Aditya Royadi") {
+            img.src = "images/ttdderry.png";
+            img.style.display = "block";
+        } else {
+            img.src = "";
+            img.style.display = "none";
+        }
+    });
+
     const aktivitasGabungan = getSelectedAktivitas();
     document.querySelectorAll('.out_reason').forEach(el => el.innerText = aktivitasGabungan || '-');
 }
@@ -408,10 +421,10 @@ async function prosesLembur() {
     formData.append("nama", nama); 
     formData.append("div_dept", document.getElementById('in_divisi').value + " / " + document.getElementById('in_dept').value); 
     formData.append("tanggal", document.getElementById('in_tgl').value); 
-    formData.append("waktu_absen", ""); // DIKOSONGKAN SESUAI PERMINTAAN
+    formData.append("waktu_absen", ""); 
     formData.append("request", document.getElementById('in_req_mulai').value + " s/d " + document.getElementById('in_req_akhir').value); 
     formData.append("total", document.getElementById('in_total').value); 
-    formData.append("aktivitas", getSelectedAktivitas()); // MENGIRIM HASIL PILIHAN CEKLIS
+    formData.append("aktivitas", getSelectedAktivitas()); 
 
     try {
         await fetch(SCRIPT_URL, {
