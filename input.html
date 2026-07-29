@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Document Handover - Sistem Logistik</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+ <div id="root"></div>
+  <script type="text/babel">
+   const { useState, useEffect, useRef } = React;
+   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGoUdAdr2nmt36mUvClPXncOzy56iPzv_bAsCidkqlDJrVRaCqbeygvWwurpJp5_Mz/exec";
+   
+   const Icon = ({ name, className = "w-5 h-5" }) => {
+       const iconRef = useRef(null);
+       useEffect(() => {
+            if (window.lucide && iconRef.current) {
+                window.lucide.createIcons({
+                    icons: { [name]: window.lucide.icons[name] },
+                    nameAttr: 'data-lucide',
+                    attrs: { class: className }
+                });
+            }
+       }, [name, className]);
+       return <i ref={iconRef} data-lucide={name} className={className}></i>;
+    };
+
+ function App() {
+  const [suratCounter, setSuratCounter] = useState(() => parseInt(localStorage.getItem('suratCounter')) || 1);
+  const [globalRowCounter, setGlobalRowCounter] = useState(() => parseInt(localStorage.getItem('globalRowCounter')) || 1);
+  const [history, setHistory] = useState([]);
+  const firstInputRef = useRef(null);
+  const [suggestions, setSuggestions] = useState(() => {
+      const saved = localStorage.getItem('inputSuggestions');
+      return saved ? JSON.parse(saved) : { workingOrder: [], keterangan: [], invNumber: [], vendor: [], nomorPajak: [] };
+  });
+
+  const generateNoSurat = (counter) => {
+      const pad = String(counter).padStart(3, '0');
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const romanMonths = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+      return `${pad}-HSM/LOG/WO/${romanMonths[month]}/${year}`;
+  };
+
+  const initialItem = { workingOrder: '', vendor: '', keterangan: '', nomorPajak: '', invNumber: '', tanggalInvoice: '', amount: '' };
+  const [formData, setFormData] = useState({
+      noSuratJalan: generateNoSurat(suratCounter),
+      picInput: localStorage.getItem('lastPic') || '',
+      items: [{ ...initialItem }]
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+      localStorage.setItem('suratCounter', suratCounter);
+      setFormData(prev => ({ ...prev, noSuratJalan: generateNoSurat(suratCounter) }));
+  }, [suratCounter]);
+
+  useEffect(() => {
+      localStorage.setItem('globalRowCounter', globalRowCounter);
+      localStorage.setItem('inputSuggestions', JSON.stringify(suggestions));
+  }, [globalRowCounter, suggestions]);
+
+  const handleHeaderChange = (e) => {
+      const { name, value } = e.target;
+      setFormData(prev => ({ ...prev, [name]: value.toUpperCase() }));
+      if (name === 'picInput') localStorage.setItem('lastPic', value.toUpperCase());
+  };
+
+  const handleItemChange = (index, field, value) => {
+      const newItems = [...formData.items];
+      newItems[index][field] = (field === 'amount' || field === 'tanggalInvoice') ? value : value.toUpperCase();
+      setFormData(prev => ({ ...prev, items: newItems }));
+  };
+
+  const updateSuggestions = (items) => {
+      setSuggestions(prev => {
+          const newSugg = { ...prev };
+          items.forEach(item => {
+              ['workingOrder', 'keterangan', 'invNumber', 'vendor', 'nomorPajak'].forEach(key => {
+                  if (item[key] && !newSugg[key].includes(item[key])) {
+                      newSugg[key] = [item[key], ...newSugg[key]].slice(0, 25);
+                  }
+              });
+          });
+          return newSugg;
+      });
+  };
+
+  const addItem = () => setFormData(prev => ({ ...prev, items: [...prev.items, { ...initialItem }] }));
+  const removeItem = (index) => {
+      if (formData.items.length === 1) return;
+      setFormData(prev => ({ ...prev, items: formData.items.filter((_, i) => i !== index) }));
+  };
+
+  const handleReset = () => {
+      setFormData(prev => ({ ...prev, items: [{ ...initialItem }] }));
+      setMessage({ type: '', text: '' });
+  };
+
+  const ubahNomorUrutA = () => {
+      const input = prompt("Masukkan Nomor Urut Baru untuk Kolom A:", globalRowCounter);
+      if (input !== null && !isNaN(input) && input > 0) setGlobalRowCounter(parseInt(input));
+  };
+
+  const ubahNomorSuratJalan = () => {
+      const input = prompt("Masukkan Nomor Surat Jalan Baru (Angka):", suratCounter);
+      if (input !== null && !isNaN(input) && input > 0) setSuratCounter(parseInt(input));
+  };
+
+  const handlePrint = () => {
+      window.location.href = 'print.html';
+  };
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+      setMessage({ type: '', text: '' });
+      
+      const nowTimestamp = new Date().toLocaleString('id-ID', { 
+          day: '2-digit', month: '2-digit', year: 'numeric', 
+          hour: '2-digit', minute: '2-digit', second: '2-digit' 
+      });
+
+      try {
+          let currentRow = globalRowCounter;
+          const invoiceList = formData.items.map(item => item.invNumber).join(", ");
+
+          const promises = formData.items.map((item) => {
+              const payload = {
+                  nomorUrut: currentRow++,         // Kolom A
+                  workingOrder: item.workingOrder, // Kolom B
+                  vendor: item.vendor,             // Kolom C
+                  keterangan: item.keterangan,     // Kolom D
+                  nomorPajak: item.nomorPajak,     // Kolom E
+                  invNumber: item.invNumber,       // Kolom F
+                  tanggalInvoice: item.tanggalInvoice, // Kolom G
+                  amount: item.amount,             // Kolom H
+                  picInput: formData.picInput,     // Kolom I
+                  timestamp: nowTimestamp,         // Kolom J (Tanggal & Jam Input)
+                  noSuratJalan: formData.noSuratJalan // Kolom K
+              };
+              return fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+          });
+
+          await Promise.all(promises);
+          updateSuggestions(formData.items);
+          
+          setHistory(prev => [{
+              no: formData.noSuratJalan,
+              pic: formData.picInput,
+              total: formData.items.length,
+              invoices: invoiceList, 
+              rowStart: globalRowCounter,
+              rowEnd: currentRow - 1,
+              waktu: new Date().toLocaleTimeString('id-ID')
+          }, ...prev]);
+
+          setGlobalRowCounter(currentRow);
+          setMessage({ type: 'success', text: `Data berhasil disimpan!` });
+          
+          setTimeout(() => {
+              handleReset();
+              setTimeout(() => {
+                  if (firstInputRef.current) firstInputRef.current.focus();
+              }, 100);
+          }, 1000);
+
+      } catch (err) {
+          setMessage({ type: 'error', text: 'Gagal mengirim data.' });
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
+  return (
+      <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
+          <div className="w-full max-w-[95rem] bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-slide-up">
+              
+              <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-4">
+                      <div className="p-3 bg-indigo-500 rounded-2xl">
+                          <Icon name="truck" className="w-6 h-6" />
+                      </div>
+                      <div>
+                          <h1 className="text-2xl font-black tracking-tight uppercase">Sistem Handover</h1>
+                          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Efficiency Logistics Input</p>
+                      </div>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-3">
+                      <button type="button" onClick={handlePrint} className="flex items-center gap-2 px-4 py-3 bg-orange-600/20 text-orange-400 hover:bg-orange-600 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-orange-500/30">
+                          <Icon name="printer" className="w-4 h-4" /> Cetak Surat
+                      </button>
+                      <button type="button" onClick={ubahNomorUrutA} className="flex items-center gap-2 px-4 py-3 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
+                          <Icon name="hash" className="w-4 h-4" /> Edit Urutan (A)
+                      </button>
+                      <button type="button" onClick={ubahNomorSuratJalan} className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest">
+                          <Icon name="edit-3" className="w-4 h-4" /> Ganti No Surat
+                      </button>
+                      <button type="button" onClick={handleReset} className="flex items-center gap-2 px-4 py-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest">
+                          <Icon name="rotate-ccw" className="w-4 h-4" /> Reset Baris
+                      </button>
+                  </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                      <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Nomor Surat Jalan (Kolom K)</label>
+                          <div className="relative">
+                              <Icon name="file-text" className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" />
+                              <input readOnly value={formData.noSuratJalan} className="w-full pl-12 pr-4 py-4 bg-slate-100 border border-slate-200 rounded-2xl font-black text-slate-800 outline-none" />
+                          </div>
+                      </div>
+                      <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">PIC Input (Kolom I)</label>
+                          <div className="relative">
+                              <Icon name="user" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                              <input required name="picInput" value={formData.picInput} onChange={handleHeaderChange} placeholder="NAMA PETUGAS" className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 font-bold uppercase" />
+                          </div>
+                      </div>
+                      <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Nomor Urut Awal (Kolom A)</label>
+                          <div className="relative">
+                              <Icon name="hash" className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" />
+                              <input readOnly value={globalRowCounter} className="w-full pl-12 pr-4 py-4 bg-emerald-50 border border-emerald-100 rounded-2xl font-black text-emerald-600 outline-none" />
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="space-y-4">
+                      <div className="flex justify-between items-center px-1">
+                          <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                              <Icon name="layout-list" className="w-4 h-4 text-indigo-500" /> Detail Pengiriman & Dokumen
+                          </h3>
+                          <button type="button" onClick={addItem} className="text-[10px] font-black text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-100 bg-indigo-50 px-4 py-2 rounded-xl transition-all">
+                              + Tambah Baris
+                          </button>
+                      </div>
+
+                      <div className="overflow-x-auto custom-scrollbar border border-slate-100 rounded-[1.5rem]">
+                          <table className="w-full text-left border-collapse">
+                              <thead>
+                                  <tr className="bg-slate-50/50 border-b border-slate-100">
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase w-12 text-center">A</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Working Order (B)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Vendor (C)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[180px]">Keterangan (D)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Nomor Pajak (E)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Invoice Number (F)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px]">Tanggal Inv (G)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px] text-right">Amount (H)</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase w-12 text-center"></th>
+                                  </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-50">
+                                  {formData.items.map((item, idx) => (
+                                      <tr key={idx} className="group hover:bg-slate-50/30">
+                                          <td className="p-3 text-xs font-black text-emerald-500 text-center bg-emerald-50/20">{globalRowCounter + idx}</td>
+                                          
+                                          {/* Kolom B: Working Order */}
+                                          <td className="p-2">
+                                              <input ref={idx === 0 ? firstInputRef : null} list="list-workingOrder" required value={item.workingOrder} onChange={(e) => handleItemChange(idx, 'workingOrder', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
+                                              <datalist id="list-workingOrder">{suggestions.workingOrder.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          {/* Kolom C: Vendor */}
+                                          <td className="p-2">
+                                              <input list="list-vendor" required value={item.vendor} onChange={(e) => handleItemChange(idx, 'vendor', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
+                                              <datalist id="list-vendor">{suggestions.vendor.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          {/* Kolom D: Keterangan */}
+                                          <td className="p-2">
+                                              <input list="list-keterangan" required value={item.keterangan} onChange={(e) => handleItemChange(idx, 'keterangan', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
+                                              <datalist id="list-keterangan">{suggestions.keterangan.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          {/* Kolom E: Nomor Pajak */}
+                                          <td className="p-2">
+                                              <input list="list-nomorPajak" value={item.nomorPajak} onChange={(e) => handleItemChange(idx, 'nomorPajak', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
+                                              <datalist id="list-nomorPajak">{suggestions.nomorPajak.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          {/* Kolom F: Invoice Number */}
+                                          <td className="p-2">
+                                              <input list="list-invNumber" required value={item.invNumber} onChange={(e) => handleItemChange(idx, 'invNumber', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
+                                              <datalist id="list-invNumber">{suggestions.invNumber.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          {/* Kolom G: Tanggal Invoice */}
+                                          <td className="p-2">
+                                              <input type="date" required value={item.tanggalInvoice} onChange={(e) => handleItemChange(idx, 'tanggalInvoice', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs" />
+                                          </td>
+
+                                          {/* Kolom H: Amount */}
+                                          <td className="p-2 text-right">
+                                              <input type="number" required value={item.amount} onChange={(e) => handleItemChange(idx, 'amount', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-emerald-500 font-black text-xs text-right text-emerald-600" />
+                                          </td>
+
+                                          {/* Tombol Hapus Baris */}
+                                          <td className="p-2 text-center">
+                                              <button type="button" onClick={() => removeItem(idx)} className="p-2 text-slate-300 hover:text-red-500"><Icon name="trash-2" className="w-4 h-4" /></button>
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <div className="mt-12 flex flex-col items-center gap-4">
+                      {message.text && (
+                          <div className={`w-full max-w-md p-4 rounded-2xl flex items-center gap-3 border ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
+                              <Icon name={message.type === 'success' ? "check-circle" : "alert-circle"} className="w-5 h-5" />
+                              <p className="text-sm font-bold uppercase">{message.text}</p>
+                          </div>
+                      )}
+                      <button type="submit" disabled={isSubmitting} className="w-full max-w-md bg-slate-900 text-white py-5 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-indigo-600 transition-all disabled:opacity-50">
+                          {isSubmitting ? "Memproses..." : `SIMPAN & UPDATE URUTAN (#${globalRowCounter})`}
+                      </button>
+                  </div>
+              </form>
+
+              {history.length > 0 && (
+                  <div className="border-t border-slate-50 bg-slate-50/50 p-8">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Riwayat Input Sesi Ini</h4>
+                      <div className="space-y-3">
+                          {history.map((h, i) => (
+                              <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-2">
+                                  <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                          <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md">{h.waktu}</span>
+                                          <span className="text-xs font-black text-slate-700">{h.no}</span>
+                                      </div>
+                                      <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded uppercase font-mono">Baris (A): {h.rowStart} - {h.rowEnd}</span>
+                                  </div>
+                                  <div className="flex flex-col gap-1 border-t border-slate-50 pt-2">
+                                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Daftar Invoice:</p>
+                                      <p className="text-[11px] font-bold text-slate-600 italic break-words">{h.invoices}</p>
+                                  </div>
+                                  <div className="flex justify-end pt-1">
+                                      <span className="text-[9px] font-bold text-slate-300 uppercase">{h.total} Baris | PIC: {h.pic}</span>
+                                  </div>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              )}
+          </div>
+      </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+  </script>
+</body>
+</html>
