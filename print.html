@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Document Handover - Sistem Order</title>
+    <title>Cetak Document Handover</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -118,14 +118,12 @@
                 const number = parseFloat(String(val).replace(/[^0-9.-]+/g,"")) || 0;
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
             };
-
-            // Fungsi helper untuk membersihkan format ISO string tanggal menjadi format lokal (Contoh: 30 Juni 2026)
+            
             const formatDateOnly = (dateStr) => {
                 if (!dateStr) return '-';
                 try {
-                    // Jika format mengandung 'T' (ISO format seperti 2026-06-30T17:00:00.000Z) atau bisa di-parse date
                     const date = new Date(dateStr);
-                    if (isNaN(date.getTime())) return dateStr; // Kembalikan string asli jika gagal diparse
+                    if (isNaN(date.getTime())) return dateStr;
 
                     return date.toLocaleDateString('id-ID', {
                         day: '2-digit',
@@ -142,10 +140,9 @@
 
             return (
                 <div className="max-w-6xl mx-auto">
-                    {/* Panel Pencarian */}
                     <div className="no-print bg-white p-6 rounded-3xl shadow-xl border border-slate-100 mb-8 animate-fade-in relative overflow-hidden">
                         <a href="input.html" className="absolute top-6 right-6 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-indigo-600 transition-colors">
-                            <Icon name="arrow-left" className="w-3 h-3" /> Kembali ke Input
+                            <Icon name="arrow-left" className="w-3 h-3" /> Kembali 
                         </a>
 
                         <div className="flex items-center gap-3 mb-6">
@@ -165,7 +162,7 @@
                                 </div>
                                 <input 
                                     type="text"
-                                    placeholder="Contoh: SJ-001/HSM/..."
+                                    placeholder="Contoh: 001-HSM/..."
                                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white transition-all font-bold"
                                     value={searchNo}
                                     onChange={(e) => setSearchNo(e.target.value.toUpperCase())}
@@ -182,15 +179,13 @@
                         {error && <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold border border-red-100">{error}</div>}
                     </div>
 
-                    {/* Area Cetak */}
                     {items.length > 0 ? (
                         <div className="print-area bg-white p-8 shadow-2xl border border-slate-100 min-h-[1050px] relative animate-fade-in flex flex-col">
                             
-                            {/* Header */}
                             <div className="flex justify-between items-start border-b-2 border-slate-900 pb-4 mb-6">
                                 <div>
                                     <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Document Handover</h1>
-                                    <p className="text-slate-400 font-bold tracking-widest text-[9px] uppercase">Logistics Delivery System</p>
+                                    <p className="text-slate-400 font-bold tracking-widest text-[9px] uppercase">Logistics Delivery</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-slate-500">No. Surat Jalan: <span className="text-slate-900 font-black">{metadata.noSuratJalan || searchNo}</span></p>
@@ -248,7 +243,7 @@
 
                             <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-slate-100">
                                 <div className="text-center flex flex-col items-center">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Dibuat Oleh (Admin)</p>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Dibuat Oleh</p>
                                     <div className="h-16 flex items-center justify-center">
                                         {isDerry ? (
                                             <img src="images/ttdderry.png" alt="Signature" className="signature-img" />
@@ -284,7 +279,7 @@
                         !loading && (
                             <div className="bg-white p-24 rounded-[3rem] text-center border-4 border-dashed border-slate-100">
                                 <Icon name="search" className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                <h3 className="text-xl font-black text-slate-300 uppercase">Siap Mencetak</h3>
+                                <h3 className="text-xl font-black text-slate-300 uppercase">Cetak</h3>
                                 <p className="text-slate-300 font-bold text-sm">Masukkan nomor surat jalan di atas untuk menampilkan data</p>
                             </div>
                         )
