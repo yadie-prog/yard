@@ -73,7 +73,9 @@
         };
 
         function App() {
-            const [searchNo, setSearchNo] = useState('');
+            const [searchNo, setSearchNo] = useState(() => {
+                try { return new URLSearchParams(window.location.search).get('noSuratJalan') || ''; } catch (e) { return ''; }
+            });
             const [loading, setLoading] = useState(false);
             const [items, setItems] = useState([]);
             const [error, setError] = useState('');
@@ -83,18 +85,21 @@
                 const now = new Date();
                 const options = { day: '2-digit', month: 'long', year: 'numeric' };
                 setPrintDate(now.toLocaleDateString('id-ID', options));
+                const preset = (() => { try { return new URLSearchParams(window.location.search).get('noSuratJalan') || ''; } catch (err) { return ''; } })();
+                if (preset) handleSearch(null, preset);
             }, []);
 
-            const handleSearch = async (e) => {
+            const handleSearch = async (e, overrideNo) => {
                 if (e) e.preventDefault();
-                if (!searchNo) return;
+                const targetNo = overrideNo || searchNo;
+                if (!targetNo) return;
                 
                 setLoading(true);
                 setError('');
                 setItems([]);
 
                 try {
-                    const response = await fetch(`${SCRIPT_URL}?action=read&noSuratJalan=${encodeURIComponent(searchNo)}`);
+                    const response = await fetch(`${SCRIPT_URL}?action=read&noSuratJalan=${encodeURIComponent(targetNo)}`);
                     const result = await response.json();
 
                     if (result.status === "success" && result.data) {
@@ -136,7 +141,10 @@
             };
 
             const metadata = items[0] || {};
-            const isDerry = metadata.picInput && metadata.picInput.toUpperCase() === "DERRY";
+            const sumOf = (key) => items.reduce((acc, it) => acc + (parseFloat(String(it[key] ?? '').replace(/[^0-9.-]+/g, "")) || 0), 0);
+            const totalTermin = sumOf('nominalTermin');
+            const totalPPN = sumOf('nominalPPN');
+            const totalAmount = sumOf('amount');
 
             return (
                 <div className="max-w-6xl mx-auto">
@@ -202,8 +210,8 @@
                                         <p className="text-lg font-black text-slate-900">{items.length}</p>
                                     </div>
                                     <div className="border-l border-slate-200 pl-4">
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase">PIC Input</p>
-                                        <p className="text-sm font-black text-slate-900 uppercase">{metadata.picInput || '-'}</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase">Total Amount</p>
+                                        <p className="text-sm font-black text-slate-900 uppercase">{formatCurrency(totalAmount)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -219,6 +227,8 @@
                                             <th className="py-2 px-3 text-left text-[9px] font-black uppercase">No. Invoice & Pajak</th>
                                             <th className="py-2 px-3 text-left text-[9px] font-black uppercase">Tgl Invoice</th>
                                             <th className="py-2 px-3 text-left text-[9px] font-black uppercase">Keterangan</th>
+                                            <th className="py-2 px-3 text-right text-[9px] font-black uppercase">Termin</th>
+                                            <th className="py-2 px-3 text-right text-[9px] font-black uppercase">PPN</th>
                                             <th className="py-2 px-3 text-right text-[9px] font-black uppercase">Amount</th>
                                         </tr>
                                     </thead>
@@ -234,10 +244,20 @@
                                                 </td>
                                                 <td className="py-2 px-3 text-xs border border-slate-100">{formatDateOnly(item.tanggalInvoice)}</td>
                                                 <td className="py-2 px-3 text-xs border border-slate-100">{item.keterangan || '-'}</td>
+                                                <td className="py-2 px-3 text-right text-xs border border-slate-100">{formatCurrency(item.nominalTermin)}</td>
+                                                <td className="py-2 px-3 text-right text-xs border border-slate-100">{formatCurrency(item.nominalPPN)}</td>
                                                 <td className="py-2 px-3 text-right text-xs font-black border border-slate-100">{formatCurrency(item.amount)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
+                                    <tfoot>
+                                        <tr className="bg-slate-100">
+                                            <td className="py-2 px-3 text-right text-[9px] font-black uppercase border border-slate-100" colSpan={6}>Total</td>
+                                            <td className="py-2 px-3 text-right text-xs font-black border border-slate-100">{formatCurrency(totalTermin)}</td>
+                                            <td className="py-2 px-3 text-right text-xs font-black border border-slate-100">{formatCurrency(totalPPN)}</td>
+                                            <td className="py-2 px-3 text-right text-xs font-black border border-slate-100">{formatCurrency(totalAmount)}</td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
 
@@ -245,13 +265,9 @@
                                 <div className="text-center flex flex-col items-center">
                                     <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Dibuat Oleh</p>
                                     <div className="h-16 flex items-center justify-center">
-                                        {isDerry ? (
-                                            <img src="images/ttdderry.png" alt="Signature" className="signature-img" />
-                                        ) : (
-                                            <div className="h-16"></div>
-                                        )}
+                                        <div className="h-16"></div>
                                     </div>
-                                    <p className="text-xs font-black border-b border-slate-900 pb-1 uppercase w-full">{metadata.picInput || 'Admin'}</p>
+                                    <p className="text-xs font-black border-b border-slate-900 pb-1 uppercase w-full">&nbsp;</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[9px] font-black text-slate-400 uppercase mb-16">Logistik</p>
