@@ -63,7 +63,7 @@
       return `${pad}-HSM/LOG/WO/${romanMonths[month]}/${year}`;
   };
 
-  const initialItem = { workingOrder: '', vendor: '', keterangan: '', nomorPajak: '', invNumber: '', tanggalInvoice: '', amount: '' };
+  const initialItem = { workingOrder: '', vendor: '', keterangan: '', nomorPajak: '', nominalTermin: '', nominalPPN: '', invNumber: '', tanggalInvoice: '', amount: '' };
   const [formData, setFormData] = useState({
       noSuratJalan: generateNoSurat(suratCounter),
       picInput: localStorage.getItem('lastPic') || '',
@@ -91,7 +91,8 @@
 
   const handleItemChange = (index, field, value) => {
       const newItems = [...formData.items];
-      newItems[index][field] = (field === 'amount' || field === 'tanggalInvoice') ? value : value.toUpperCase();
+      const numericFields = ['amount', 'tanggalInvoice', 'nominalTermin', 'nominalPPN'];
+      newItems[index][field] = numericFields.includes(field) ? value : value.toUpperCase();
       setFormData(prev => ({ ...prev, items: newItems }));
   };
 
@@ -155,6 +156,8 @@
                   vendor: item.vendor,
                   keterangan: item.keterangan,
                   nomorPajak: item.nomorPajak,
+                  nominalTermin: item.nominalTermin,
+                  nominalPPN: item.nominalPPN,
                   invNumber: item.invNumber,
                   tanggalInvoice: item.tanggalInvoice,
                   amount: item.amount,
@@ -198,7 +201,7 @@
   return (
       <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
           <div className="w-full max-w-[95rem] bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-slide-up">
-              
+               
               <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="flex items-center gap-4">
                       <div className="p-3 bg-indigo-500 rounded-2xl">
@@ -269,6 +272,8 @@
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Vendor</th>
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[180px]">Keterangan / Detail</th>
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Tax Number</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px] text-right">Nominal Termin</th>
+                                      <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px] text-right">Nominal PPN</th>
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[140px]">Invoice Number</th>
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px]">Tanggal Inv</th>
                                       <th className="p-4 text-[10px] font-black text-slate-400 uppercase min-w-[130px] text-right">Amount</th>
@@ -298,6 +303,14 @@
                                           <td className="p-2">
                                               <input list="list-nomorPajak" value={item.nomorPajak} onChange={(e) => handleItemChange(idx, 'nomorPajak', e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-bold text-xs uppercase" />
                                               <datalist id="list-nomorPajak">{suggestions.nomorPajak.map((s, i) => <option key={i} value={s} />)}</datalist>
+                                          </td>
+
+                                          <td className="p-2 text-right">
+                                              <input type="number" value={item.nominalTermin} onChange={(e) => handleItemChange(idx, 'nominalTermin', e.target.value)} placeholder="0" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 font-black text-xs text-right text-blue-600" />
+                                          </td>
+
+                                          <td className="p-2 text-right">
+                                              <input type="number" value={item.nominalPPN} onChange={(e) => handleItemChange(idx, 'nominalPPN', e.target.value)} placeholder="0" className="w-full p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-500 font-black text-xs text-right text-amber-600" />
                                           </td>
 
                                           <td className="p-2">
